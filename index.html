@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>كفالاتي</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .error {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .success {
+            color: #27ae60;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .child-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-right: 4px solid #667eea;
+        }
+
+        .child-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .child-info {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .kafala-list {
+            margin-top: 10px;
+        }
+
+        .kafala-item {
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .kafala-info {
+            flex: 1;
+        }
+
+        .kafala-org {
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .kafala-amount {
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        .kafala-date {
+            color: #999;
+            font-size: 12px;
+        }
+
+        .btn-small {
+            padding: 5px 10px;
+            font-size: 12px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .stats {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .stats h3 {
+            margin-bottom: 10px;
+        }
+
+        .stats-amount {
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        .section-title {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .logout-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .header {
+            position: relative;
+        }
+
+        .org-suggestions {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            max-height: 150px;
+            overflow-y: auto;
+            position: absolute;
+            width: 100%;
+            z-index: 100;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .org-suggestion-item {
+            padding: 10px;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .org-suggestion-item:hover {
+            background: #f8f9fa;
+        }
+
+        .form-group {
+            position: relative;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            background: #f0f0f0;
+            border-radius: 10px;
+            padding: 5px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            background: white;
+            color: #667eea;
+            font-weight: bold;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #667eea;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <button class="logout-btn hidden" id="logoutBtn" onclick="logout()">تسجيل خروج</button>
+            <h1>كفالاتي</h1>
+            <p>تتبع كفالات أولادك بسهولة</p>
+        </div>
+
+        <div class="content">
+            <!-- Login Form -->
+            <div id="loginSection">
+                <div class="tabs">
+                    <div class="tab active" onclick="switchTab('login')" id="loginTab">تسجيل دخول</div>
+                    <div class="tab" onclick="switchTab('register')" id="registerTab">إنشاء حساب</div>
+                </div>
+
+                <div id="loginForm">
+                    <div class="form-group">
+                        <label>رقم الهوية</label>
+                        <input type="text" id="loginId" placeholder="أدخل رقم الهوية">
+                    </div>
+                    <div class="form-group">
+                        <label>كلمة المرور</label>
+                        <input type="password" id="loginPassword" placeholder="أدخل كلمة المرور">
+                    </div>
+                    <div id="loginError" class="error"></div>
+                    <button class="btn btn-primary" onclick="login()">تسجيل الدخول</button>
+                </div>
+
+                <div id="registerForm" class="hidden">
+                    <div class="form-group">
+                        <label>رقم الهوية</label>
+                        <input type="text" id="registerId" placeholder="أدخل رقم الهوية">
+                    </div>
+                    <div class="form-group">
+                        <label>الاسم</label>
+                        <input type="text" id="registerName" placeholder="أدخل اسمك">
+                    </div>
+                    <div class="form-group">
+                        <label>كلمة المرور</label>
+                        <input type="password" id="registerPassword" placeholder="أدخل كلمة المرور">
+                    </div>
+                    <div class="form-group">
+                        <label>تأكيد كلمة المرور</label>
+                        <input type="password" id="registerConfirm" placeholder="أعد إدخال كلمة المرور">
+                    </div>
+                    <div id="registerError" class="error"></div>
+                    <button class="btn btn-success" onclick="register()">إنشاء حساب</button>
+                </div>
+            </div>
+
+            <!-- Main App -->
+            <div id="appSection" class="hidden">
+                <!-- Stats -->
+                <div class="stats">
+                    <h3>إجمالي الكفالات</h3>
+                    <div class="stats-amount" id="totalAmount">0 ₪</div>
+                </div>
+
+                <!-- Add Child Form -->
+                <div class="section-title">إضافة طفل جديد</div>
+                <div class="form-group">
+                    <label>اسم الطفل</label>
+                    <input type="text" id="childName" placeholder="أدخل اسم الطفل">
+                </div>
+                <div class="form-group">
+                    <label>العمر</label>
+                    <input type="number" id="childAge" placeholder="أدخل عمر الطفل">
+                </div>
+                <button class="btn btn-success" onclick="addChild()">إضافة طفل</button>
+
+                <!-- Children List -->
+                <div class="section-title" style="margin-top: 30px;">قائمة الأطفال</div>
+                <div id="childrenList">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">👶</div>
+                        <p>لا يوجد أطفال مسجلين</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add Kafala Modal -->
+            <div id="kafalaModal" class="hidden" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000;">
+                <div style="background: white; padding: 20px; border-radius: 20px; width: 90%; max-width: 400px;">
+                    <h3 style="margin-bottom: 20px; color: #333;">إضافة كفالة</h3>
+                    <input type="hidden" id="kafalaChildId">
+                    <div class="form-group">
+                        <label>الجهة الكافلة</label>
+                        <input type="text" id="kafalaOrg" placeholder="اختر أو اكتب جهة جديدة" oninput="showOrgSuggestions()" autocomplete="off">
+                        <div id="orgSuggestions" class="org-suggestions hidden"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>المبلغ</label>
+                        <input type="number" id="kafalaAmount" placeholder="أدخل المبلغ">
+                    </div>
+                    <div class="form-group">
+                        <label>التاريخ</label>
+                        <input type="date" id="kafalaDate">
+                    </div>
+                    <div class="form-group">
+                        <label>ملاحظات (اختياري)</label>
+                        <input type="text" id="kafalaNotes" placeholder="أي ملاحظات إضافية">
+                    </div>
+                    <button class="btn btn-success" onclick="saveKafala()">حفظ الكفالة</button>
+                    <button class="btn btn-secondary" onclick="closeKafalaModal()" style="margin-top: 10px;">إلغاء</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+        import { getFirestore, collection, doc, setDoc, getDoc, getDocs, addDoc, deleteDoc, updateDoc, query, where, orderBy } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyA-kLyNNxhS7l4i7D8SreRbpet0Z4vts6M",
+            authDomain: "kafalaty-9bda9.firebaseapp.com",
+            projectId: "kafalaty-9bda9",
+            storageBucket: "kafalaty-9bda9.firebasestorage.app",
+            messagingSenderId: "675827188271",
+            appId: "1:675827188271:web:d0273d7e682fdf5751bcda",
+            measurementId: "G-J3YY9THBQS"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Global variables
+        let currentUser = null;
+        let currentUserData = null;
+        let children = [];
+        let organizations = [];
+
+        // Make functions available globally
+        window.switchTab = function(tab) {
+            document.getElementById('loginTab').classList.toggle('active', tab === 'login');
+            document.getElementById('registerTab').classList.toggle('active', tab === 'register');
+            document.getElementById('loginForm').classList.toggle('hidden', tab !== 'login');
+            document.getElementById('registerForm').classList.toggle('hidden', tab !== 'register');
+        };
+
+        window.login = async function() {
+            const id = document.getElementById('loginId').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            const errorDiv = document.getElementById('loginError');
+
+            if (!id || !password) {
+                errorDiv.textContent = 'الرجاء إدخال رقم الهوية وكلمة المرور';
+                return;
+            }
+
+            try {
+                const email = id + '@kafalaty.app';
+                await signInWithEmailAndPassword(auth, email, password);
+                errorDiv.textContent = '';
+            } catch (error) {
+                errorDiv.textContent = 'رقم الهوية أو كلمة المرور غير صحيحة';
+            }
+        };
+
+        window.register = async function() {
+            const id = document.getElementById('registerId').value.trim();
+            const name = document.getElementById('registerName').value.trim();
+            const password = document.getElementById('registerPassword').value;
+            const confirm = document.getElementById('registerConfirm').value;
+            const errorDiv = document.getElementById('registerError');
+
+            if (!id || !name || !password) {
+                errorDiv.textContent = 'الرجاء ملء جميع الحقول';
+                return;
+            }
+
+            if (password !== confirm) {
+                errorDiv.textContent = 'كلمتا المرور غير متطابقتين';
+                return;
+            }
+
+            if (password.length < 6) {
+                errorDiv.textContent = 'كلمة المرور يجب أن تكون 6 أحرف على الأقل';
+                return;
+            }
+
+            try {
+                const email = id + '@kafalaty.app';
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+
+                // Save user data
+                await setDoc(doc(db, 'users', userCredential.user.uid), {
+                    id: id,
+                    name: name,
+                    email: email,
+                    createdAt: new Date().toISOString()
+                });
+
+                errorDiv.textContent = '';
+                alert('تم إنشاء الحساب بنجاح!');
+                switchTab('login');
+            } catch (error) {
+                if (error.code === 'auth/email-already-in-use') {
+                    errorDiv.textContent = 'رقم الهوية مسجل مسبقاً';
+                } else {
+                    errorDiv.textContent = 'حدث خطأ، حاول مرة أخرى';
+                }
+            }
+        };
+
+        window.logout = async function() {
+            await signOut(auth);
+        };
+
+        window.addChild = async function() {
+            const name = document.getElementById('childName').value.trim();
+            const age = document.getElementById('childAge').value;
+
+            if (!name || !age) {
+                alert('الرجاء إدخال اسم الطفل والعمر');
+                return;
+            }
+
+            try {
+                await addDoc(collection(db, 'users', currentUser.uid, 'children'), {
+                    name: name,
+                    age: parseInt(age),
+                    createdAt: new Date().toISOString()
+                });
+
+                document.getElementById('childName').value = '';
+                document.getElementById('childAge').value = '';
+                loadChildren();
+            } catch (error) {
+                alert('حدث خطأ أثناء إضافة الطفل');
+            }
+        };
+
+        window.deleteChild = async function(childId) {
+            if (!confirm('هل أنت متأكد من حذف هذا الطفل وجميع كفالاته؟')) return;
+
+            try {
+                // Delete all kafalat first
+                const kafalatSnapshot = await getDocs(collection(db, 'users', currentUser.uid, 'children', childId, 'kafalat'));
+                for (const doc of kafalatSnapshot.docs) {
+                    await deleteDoc(doc.ref);
+                }
+
+                await deleteDoc(doc(db, 'users', currentUser.uid, 'children', childId));
+                loadChildren();
+            } catch (error) {
+                alert('حدث خطأ أثناء الحذف');
+            }
+        };
+
+        window.openKafalaModal = function(childId) {
+            document.getElementById('kafalaChildId').value = childId;
+            document.getElementById('kafalaOrg').value = '';
+            document.getElementById('kafalaAmount').value = '';
+            document.getElementById('kafalaDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('kafalaNotes').value = '';
+            document.getElementById('kafalaModal').classList.remove('hidden');
+            loadOrganizations();
+        };
+
+        window.closeKafalaModal = function() {
+            document.getElementById('kafalaModal').classList.add('hidden');
+            document.getElementById('orgSuggestions').classList.add('hidden');
+        };
+
+        window.showOrgSuggestions = function() {
+            const input = document.getElementById('kafalaOrg').value.toLowerCase();
+            const suggestionsDiv = document.getElementById('orgSuggestions');
+
+            if (!input) {
+                suggestionsDiv.classList.add('hidden');
+                return;
+            }
+
+            const filtered = organizations.filter(org => org.toLowerCase().includes(input));
+
+            if (filtered.length > 0) {
+                suggestionsDiv.innerHTML = filtered.map(org => 
+                    `<div class="org-suggestion-item" onclick="selectOrg('${org}')">${org}</div>`
+                ).join('');
+                suggestionsDiv.classList.remove('hidden');
+            } else {
+                suggestionsDiv.classList.add('hidden');
+            }
+        };
+
+        window.selectOrg = function(org) {
+            document.getElementById('kafalaOrg').value = org;
+            document.getElementById('orgSuggestions').classList.add('hidden');
+        };
+
+        window.saveKafala = async function() {
+            const childId = document.getElementById('kafalaChildId').value;
+            const org = document.getElementById('kafalaOrg').value.trim();
+            const amount = document.getElementById('kafalaAmount').value;
+            const date = document.getElementById('kafalaDate').value;
+            const notes = document.getElementById('kafalaNotes').value.trim();
+
+            if (!org || !amount || !date) {
+                alert('الرجاء ملء جميع الحقول المطلوبة');
+                return;
+            }
+
+            try {
+                await addDoc(collection(db, 'users', currentUser.uid, 'children', childId, 'kafalat'), {
+                    organization: org,
+                    amount: parseFloat(amount),
+                    date: date,
+                    notes: notes,
+                    createdAt: new Date().toISOString()
+                });
+
+                // Add to organizations list if new
+                if (!organizations.includes(org)) {
+                    organizations.push(org);
+                }
+
+                closeKafalaModal();
+                loadChildren();
+            } catch (error) {
+                alert('حدث خطأ أثناء حفظ الكفالة');
+            }
+        };
+
+        window.deleteKafala = async function(childId, kafalaId) {
+            if (!confirm('هل أنت متأكد من حذف هذه الكفالة؟')) return;
+
+            try {
+                await deleteDoc(doc(db, 'users', currentUser.uid, 'children', childId, 'kafalat', kafalaId));
+                loadChildren();
+            } catch (error) {
+                alert('حدث خطأ أثناء الحذف');
+            }
+        };
+
+        async function loadOrganizations() {
+            organizations = [];
+            const childrenSnapshot = await getDocs(collection(db, 'users', currentUser.uid, 'children'));
+
+            for (const childDoc of childrenSnapshot.docs) {
+                const kafalatSnapshot = await getDocs(collection(db, 'users', currentUser.uid, 'children', childDoc.id, 'kafalat'));
+                kafalatSnapshot.forEach(kafalaDoc => {
+                    const org = kafalaDoc.data().organization;
+                    if (!organizations.includes(org)) {
+                        organizations.push(org);
+                    }
+                });
+            }
+        }
+
+        async function loadChildren() {
+            const listDiv = document.getElementById('childrenList');
+            listDiv.innerHTML = '<div class="loading"><div class="spinner"></div>جاري التحميل...</div>';
+
+            try {
+                const snapshot = await getDocs(query(collection(db, 'users', currentUser.uid, 'children'), orderBy('createdAt', 'desc')));
+                children = [];
+                let totalKafalat = 0;
+
+                if (snapshot.empty) {
+                    listDiv.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">👶</div>
+                            <p>لا يوجد أطفال مسجلين</p>
+                        </div>
+                    `;
+                    document.getElementById('totalAmount').textContent = '0 ₪';
+                    return;
+                }
+
+                let html = '';
+
+                for (const doc of snapshot.docs) {
+                    const child = { id: doc.id, ...doc.data() };
+                    children.push(child);
+
+                    // Load kafalat for this child
+                    const kafalatSnapshot = await getDocs(query(
+                        collection(db, 'users', currentUser.uid, 'children', doc.id, 'kafalat'),
+                        orderBy('date', 'desc')
+                    ));
+
+                    let kafalatHtml = '';
+                    let childTotal = 0;
+
+                    kafalatSnapshot.forEach(kafalaDoc => {
+                        const kafala = kafalaDoc.data();
+                        childTotal += kafala.amount;
+                        totalKafalat += kafala.amount;
+
+                        kafalatHtml += `
+                            <div class="kafala-item">
+                                <div class="kafala-info">
+                                    <div class="kafala-org">${kafala.organization}</div>
+                                    <div class="kafala-amount">${kafala.amount} ₪</div>
+                                    <div class="kafala-date">${kafala.date} ${kafala.notes ? '- ' + kafala.notes : ''}</div>
+                                </div>
+                                <button class="btn-small btn-danger" onclick="deleteKafala('${doc.id}', '${kafalaDoc.id}')">حذف</button>
+                            </div>
+                        `;
+                    });
+
+                    html += `
+                        <div class="child-card">
+                            <div style="display: flex; justify-content: space-between; align-items: start;">
+                                <div>
+                                    <div class="child-name">${child.name}</div>
+                                    <div class="child-info">العمر: ${child.age} سنة | إجمالي الكفالات: ${childTotal} ₪</div>
+                                </div>
+                                <button class="btn-small btn-danger" onclick="deleteChild('${doc.id}')">حذف</button>
+                            </div>
+                            <div style="margin-top: 10px;">
+                                <button class="btn-small btn-success" onclick="openKafalaModal('${doc.id}')">+ إضافة كفالة</button>
+                            </div>
+                            ${kafalatHtml ? `<div class="kafala-list">${kafalatHtml}</div>` : ''}
+                        </div>
+                    `;
+                }
+
+                listDiv.innerHTML = html;
+                document.getElementById('totalAmount').textContent = totalKafalat.toLocaleString() + ' ₪';
+
+            } catch (error) {
+                listDiv.innerHTML = '<div class="error">حدث خطأ أثناء التحميل</div>';
+            }
+        }
+
+        // Auth state listener
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                document.getElementById('loginSection').classList.add('hidden');
+                document.getElementById('appSection').classList.remove('hidden');
+                document.getElementById('logoutBtn').classList.remove('hidden');
+
+                // Load user data
+                const userDoc = await getDoc(doc(db, 'users', user.uid));
+                if (userDoc.exists()) {
+                    currentUserData = userDoc.data();
+                }
+
+                loadChildren();
+            } else {
+                currentUser = null;
+                currentUserData = null;
+                document.getElementById('loginSection').classList.remove('hidden');
+                document.getElementById('appSection').classList.add('hidden');
+                document.getElementById('logoutBtn').classList.add('hidden');
+            }
+        });
+
+        // Close modal when clicking outside
+        document.getElementById('kafalaModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeKafalaModal();
+            }
+        });
+    </script>
+</body>
+</html>
