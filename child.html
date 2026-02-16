@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#667eea">
+    <title>كفالاتي - تفاصيل الطفل</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loading-logo">💚</div>
+        <div class="loading-spinner"></div>
+        <div class="loading-text">جاري التحميل...</div>
+    </div>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <button class="logout-btn" onclick="goBack()">رجوع</button>
+            <div class="header-icon">👶</div>
+            <h1 id="childName">اسم الطفل</h1>
+            <p id="childInfo">العمر: --</p>
+        </div>
+
+        <!-- Stats -->
+        <div class="card stats-card">
+            <div class="stats-label">إجمالي الكفالات</div>
+            <div class="stats-amount" id="childTotal">0 ₪</div>
+        </div>
+
+        <!-- Kafalat List -->
+        <div class="card">
+            <h3 style="margin-bottom: 16px; color: var(--dark);">سجل الكفالات</h3>
+            <div id="kafalatList">
+                <!-- Kafalat will be loaded here -->
+            </div>
+            <div id="emptyKafalat" class="empty-state hidden">
+                <div class="empty-icon">📝</div>
+                <p>لا توجد كفالات مسجلة</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Kafala FAB -->
+    <button class="btn btn-success btn-fab" onclick="openAddKafalaModal()">
+        <span>+</span>
+        <span>إضافة كفالة</span>
+    </button>
+
+    <!-- Add Kafala Modal -->
+    <div id="addKafalaModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">إضافة كفالة جديدة</h3>
+                <button class="modal-close" onclick="closeAddKafalaModal()">×</button>
+            </div>
+            <div class="form-group" style="position: relative;">
+                <label>الجهة الكافلة</label>
+                <input type="text" id="kafalaOrg" placeholder="اختر أو اكتب جهة جديدة" autocomplete="off" oninput="showSuggestions()">
+                <div id="suggestions" class="suggestions hidden"></div>
+            </div>
+            <div class="form-group">
+                <label>المبلغ (₪)</label>
+                <input type="number" id="kafalaAmount" placeholder="أدخل المبلغ">
+            </div>
+            <div class="form-group">
+                <label>التاريخ</label>
+                <input type="date" id="kafalaDate">
+            </div>
+            <div class="form-group">
+                <label>ملاحظات (اختياري)</label>
+                <input type="text" id="kafalaNotes" placeholder="أي ملاحظات إضافية">
+            </div>
+            <button class="btn btn-success" onclick="handleAddKafala()">حفظ الكفالة</button>
+            <button class="btn btn-secondary mt-4" onclick="closeAddKafalaModal()">إلغاء</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { 
+            initAuth, 
+            loadKafalat, 
+            addKafala, 
+            deleteKafala,
+            loadOrganizations,
+            formatCurrency,
+            formatDate,
+            showLoading,
+            hideLoading,
+            showToast 
+        } from './js/app.js';
+        import { doc, getDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+        import { db, auth } from './js/firebase-config.js';
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const childId = urlParams.get('id');
+
+        if (!childId) {
+            window.location.href = 'index.html';
+        }
+
+        let organizations = [];
+
+        // Check auth and load data
+        initAuth(async (user) => {
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+            await loadChildData();
+            await loadKafalatList();
+            organizations = await loadOrganizations();
+        });
+
+        async function loadChildData() {
+            showLoading('جاري تحميل البيانات...');
+            try {
+                const childDoc = await getDoc(doc(db, 'users', auth.currentUser.uid, 'children', childId));
+                if (!childDoc.exists()) {
+                    window.location.href = 'index.html';
+                    return;
+                }
+
+                const child = childDoc.data();
+                document.getElementById('childName').textContent = child.name;
+                document.getElementById('childInfo').textContent = `العمر: ${child.age} سنة`;
+                hideLoading();
+            } catch (error) {
+                hideLoading();
+                showToast('خطأ', 'حدث خطأ أثناء التحميل', 'error');
+            }
+        }
+
+        async function loadKafalatList() {
+            const kafalat = await loadKafalat(childId);
+            const listContainer = document.getElementById('kafalatList');
+            const emptyState = document.getElementById('emptyKafalat');
+            const totalElement = document.getElementById('childTotal');
+
+            let total = 0;
+            kafalat.forEach(k => total += k.amount);
+            totalElement.textContent = formatCurrency(total);
+
+            if (kafalat.length === 0) {
+                listContainer.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+
+            let html = '';
+            kafalat.forEach(kafala => {
+                html += `
+                    <div class="kafala-item animate-fade-in">
+                        <div class="kafala-icon">💰</div>
+                        <div class="kafala-details">
+                            <div class="kafala-org">${kafala.organization}</div>
+                            <div class="kafala-date">${formatDate(kafala.date)} ${kafala.notes ? '• ' + kafala.notes : ''}</div>
+                        </div>
+                        <div class="kafala-amount">${formatCurrency(kafala.amount)}</div>
+                        <button class="btn-small btn-danger" onclick="handleDeleteKafala('${kafala.id}')">حذف</button>
+                    </div>
+                `;
+            });
+
+            listContainer.innerHTML = html;
+        }
+
+        window.goBack = function() {
+            window.location.href = 'index.html';
+        };
+
+        window.openAddKafalaModal = function() {
+            document.getElementById('addKafalaModal').classList.add('active');
+            document.getElementById('kafalaDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('kafalaOrg').focus();
+        };
+
+        window.closeAddKafalaModal = function() {
+            document.getElementById('addKafalaModal').classList.remove('active');
+            document.getElementById('kafalaOrg').value = '';
+            document.getElementById('kafalaAmount').value = '';
+            document.getElementById('kafalaNotes').value = '';
+            document.getElementById('suggestions').classList.add('hidden');
+        };
+
+        window.showSuggestions = function() {
+            const input = document.getElementById('kafalaOrg').value.toLowerCase();
+            const suggestionsDiv = document.getElementById('suggestions');
+
+            if (!input || organizations.length === 0) {
+                suggestionsDiv.classList.add('hidden');
+                return;
+            }
+
+            const filtered = organizations.filter(org => org.toLowerCase().includes(input));
+
+            if (filtered.length > 0) {
+                suggestionsDiv.innerHTML = filtered.map(org => 
+                    `<div class="suggestion-item" onclick="selectOrg('${org}')">${org}</div>`
+                ).join('');
+                suggestionsDiv.classList.remove('hidden');
+            } else {
+                suggestionsDiv.classList.add('hidden');
+            }
+        };
+
+        window.selectOrg = function(org) {
+            document.getElementById('kafalaOrg').value = org;
+            document.getElementById('suggestions').classList.add('hidden');
+        };
+
+        window.handleAddKafala = async function() {
+            const org = document.getElementById('kafalaOrg').value.trim();
+            const amount = document.getElementById('kafalaAmount').value;
+            const date = document.getElementById('kafalaDate').value;
+            const notes = document.getElementById('kafalaNotes').value.trim();
+
+            const success = await addKafala(childId, org, amount, date, notes);
+            if (success) {
+                closeAddKafalaModal();
+                await loadKafalatList();
+            }
+        };
+
+        window.handleDeleteKafala = async function(kafalaId) {
+            const success = await deleteKafala(childId, kafalaId);
+            if (success) {
+                await loadKafalatList();
+            }
+        };
+
+        // Close modal on outside click
+        document.getElementById('addKafalaModal').addEventListener('click', function(e) {
+            if (e.target === this) closeAddKafalaModal();
+        });
+    </script>
+</body>
+</html>

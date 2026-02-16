@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#667eea">
+    <title>كفالاتي - قائمة الأطفال</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192x192.png">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loading-logo">💚</div>
+        <div class="loading-spinner"></div>
+        <div class="loading-text">جاري التحميل...</div>
+    </div>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <button class="logout-btn" onclick="handleLogout()">خروج</button>
+            <div class="header-icon">👨‍👩‍👧‍👦</div>
+            <h1>كفالاتي</h1>
+            <p>تتبع كفالات أولادك بسهولة</p>
+        </div>
+
+        <!-- Stats -->
+        <div class="card stats-card">
+            <div class="stats-label">إجمالي جميع الكفالات</div>
+            <div class="stats-amount" id="totalAmount">0 ₪</div>
+        </div>
+
+        <!-- Children List -->
+        <div id="childrenList">
+            <!-- Children will be loaded here -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="empty-state hidden">
+            <div class="empty-icon">👶</div>
+            <p>لا يوجد أطفال مسجلين</p>
+            <p class="mb-4">اضغط الزر أدناه لإضافة طفل</p>
+        </div>
+    </div>
+
+    <!-- Add Child FAB -->
+    <button class="btn btn-primary btn-fab" onclick="openAddChildModal()">
+        <span>+</span>
+        <span>إضافة طفل</span>
+    </button>
+
+    <!-- Add Child Modal -->
+    <div id="addChildModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">إضافة طفل جديد</h3>
+                <button class="modal-close" onclick="closeAddChildModal()">×</button>
+            </div>
+            <div class="form-group">
+                <label>اسم الطفل</label>
+                <input type="text" id="childName" placeholder="أدخل اسم الطفل">
+            </div>
+            <div class="form-group">
+                <label>العمر</label>
+                <input type="number" id="childAge" placeholder="أدخل عمر الطفل">
+            </div>
+            <button class="btn btn-success" onclick="handleAddChild()">إضافة</button>
+            <button class="btn btn-secondary mt-4" onclick="closeAddChildModal()">إلغاء</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { 
+            initAuth, 
+            logout, 
+            addChild, 
+            loadChildren, 
+            deleteChild,
+            formatCurrency,
+            showLoading,
+            hideLoading,
+            showToast 
+        } from './js/app.js';
+
+        let currentChildren = [];
+
+        // Check auth state
+        initAuth((user) => {
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+            loadChildrenList();
+        });
+
+        async function loadChildrenList() {
+            showLoading('جاري تحميل البيانات...');
+            currentChildren = await loadChildren();
+            hideLoading();
+            renderChildren();
+        }
+
+        function renderChildren() {
+            const listContainer = document.getElementById('childrenList');
+            const emptyState = document.getElementById('emptyState');
+            const totalElement = document.getElementById('totalAmount');
+
+            if (currentChildren.length === 0) {
+                listContainer.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                totalElement.textContent = '0 ₪';
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+
+            let totalAll = 0;
+            let html = '';
+
+            currentChildren.forEach(child => {
+                totalAll += child.totalKafalat;
+                html += `
+                    <div class="card child-card animate-fade-in" onclick="goToChild('${child.id}')">
+                        <div class="child-avatar">👶</div>
+                        <div class="child-info">
+                            <div class="child-name">${child.name}</div>
+                            <div style="font-size: 13px; color: #6b7280;">${child.age} سنة • ${child.kafalatCount} كفالة</div>
+                        </div>
+                        <div class="child-total">${formatCurrency(child.totalKafalat)}</div>
+                        <div class="child-arrow">‹</div>
+                    </div>
+                `;
+            });
+
+            listContainer.innerHTML = html;
+            totalElement.textContent = formatCurrency(totalAll);
+        }
+
+        window.goToChild = function(childId) {
+            window.location.href = `child.html?id=${childId}`;
+        };
+
+        window.openAddChildModal = function() {
+            document.getElementById('addChildModal').classList.add('active');
+            document.getElementById('childName').focus();
+        };
+
+        window.closeAddChildModal = function() {
+            document.getElementById('addChildModal').classList.remove('active');
+            document.getElementById('childName').value = '';
+            document.getElementById('childAge').value = '';
+        };
+
+        window.handleAddChild = async function() {
+            const name = document.getElementById('childName').value.trim();
+            const age = document.getElementById('childAge').value;
+
+            const childId = await addChild(name, age);
+            if (childId) {
+                closeAddChildModal();
+                await loadChildrenList();
+            }
+        };
+
+        window.handleLogout = async function() {
+            await logout();
+            window.location.href = 'login.html';
+        };
+
+        // Close modal on outside click
+        document.getElementById('addChildModal').addEventListener('click', function(e) {
+            if (e.target === this) closeAddChildModal();
+        });
+
+        // Register Service Worker for PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+                .then(() => console.log('Service Worker registered'))
+                .catch(err => console.log('Service Worker error:', err));
+        }
+    </script>
+</body>
+</html>

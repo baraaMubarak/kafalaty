@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#667eea">
+    <title>كفالاتي - تسجيل الدخول</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loading-logo">💚</div>
+        <div class="loading-spinner"></div>
+        <div class="loading-text">جاري التحميل...</div>
+    </div>
+
+    <div class="container">
+        <div class="header" style="margin-top: 40px;">
+            <div class="header-icon">💚</div>
+            <h1>كفالاتي</h1>
+            <p>تتبع كفالات أولادك بسهولة وأمان</p>
+        </div>
+
+        <div class="card">
+            <div class="tabs">
+                <div class="tab active" id="loginTab" onclick="switchTab('login')">تسجيل دخول</div>
+                <div class="tab" id="registerTab" onclick="switchTab('register')">حساب جديد</div>
+            </div>
+
+            <!-- Login Form -->
+            <div id="loginForm">
+                <div class="form-group">
+                    <label>رقم الهوية</label>
+                    <input type="text" id="loginId" placeholder="أدخل رقم الهوية">
+                </div>
+                <div class="form-group">
+                    <label>كلمة المرور</label>
+                    <input type="password" id="loginPassword" placeholder="أدخل كلمة المرور">
+                </div>
+                <button class="btn btn-primary" onclick="handleLogin()">تسجيل الدخول</button>
+            </div>
+
+            <!-- Register Form -->
+            <div id="registerForm" class="hidden">
+                <div class="form-group">
+                    <label>رقم الهوية</label>
+                    <input type="text" id="registerId" placeholder="أدخل رقم الهوية">
+                </div>
+                <div class="form-group">
+                    <label>الاسم</label>
+                    <input type="text" id="registerName" placeholder="أدخل اسمك">
+                </div>
+                <div class="form-group">
+                    <label>كلمة المرور</label>
+                    <input type="password" id="registerPassword" placeholder="أدخل كلمة المرور">
+                </div>
+                <div class="form-group">
+                    <label>تأكيد كلمة المرور</label>
+                    <input type="password" id="registerConfirm" placeholder="أعد إدخال كلمة المرور">
+                </div>
+                <button class="btn btn-success" onclick="handleRegister()">إنشاء حساب</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initAuth, login, register, showLoading } from './js/app.js';
+
+        // Check if already logged in
+        initAuth((user) => {
+            if (user) {
+                window.location.href = 'index.html';
+            }
+        });
+
+        window.switchTab = function(tab) {
+            document.getElementById('loginTab').classList.toggle('active', tab === 'login');
+            document.getElementById('registerTab').classList.toggle('active', tab === 'register');
+            document.getElementById('loginForm').classList.toggle('hidden', tab !== 'login');
+            document.getElementById('registerForm').classList.toggle('hidden', tab !== 'register');
+        };
+
+        window.handleLogin = async function() {
+            const id = document.getElementById('loginId').value.trim();
+            const password = document.getElementById('loginPassword').value;
+
+            const success = await login(id, password);
+            if (success) {
+                window.location.href = 'index.html';
+            }
+        };
+
+        window.handleRegister = async function() {
+            const id = document.getElementById('registerId').value.trim();
+            const name = document.getElementById('registerName').value.trim();
+            const password = document.getElementById('registerPassword').value;
+            const confirm = document.getElementById('registerConfirm').value;
+
+            const success = await register(id, name, password, confirm);
+            if (success) {
+                window.location.href = 'index.html';
+            }
+        };
+    </script>
+</body>
+</html>
