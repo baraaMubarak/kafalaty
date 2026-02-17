@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#2d5a3d">
+    <title>كشف الشهداء - نظام مرن</title>
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a472a 0%, #2d5a3d 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .container { max-width: 100%; padding: 10px; padding-bottom: 100px; }
+        
+        .header {
+            background: rgba(255,255,255,0.95);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 15px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 { color: #2d5a3d; font-size: 1.3rem; margin-bottom: 5px; }
+        .header p { color: #666; font-size: 0.85rem; }
+        
+        .stats-overview {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .stat-box {
+            background: #f0f7f0;
+            padding: 10px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .stat-box-number {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #2d5a3d;
+        }
+        
+        .stat-box-label {
+            font-size: 0.7rem;
+            color: #666;
+        }
+        
+        .upload-section, .mapping-section, .search-section, .results-section {
+            background: rgba(255,255,255,0.95);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .upload-area {
+            border: 3px dashed #2d5a3d;
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            cursor: pointer;
+            background: #f8faf8;
+            transition: all 0.3s;
+        }
+        
+        .upload-area:hover { background: #e8f5e9; }
+        .upload-area:active { background: #d4edda; }
+        
+        #fileInput { display: none; }
+        
+        .mapping-grid {
+            display: grid;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .mapping-item {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 10px;
+            border-right: 3px solid #2d5a3d;
+        }
+        
+        .mapping-label {
+            font-weight: bold;
+            color: #2d5a3d;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .mapping-select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            background: white;
+            cursor: pointer;
+        }
+        
+        .mapping-select:focus {
+            border-color: #2d5a3d;
+            outline: none;
+        }
+        
+        .mapping-hint {
+            font-size: 0.75rem;
+            color: #888;
+            margin-top: 5px;
+        }
+        
+        .search-box { position: relative; margin-bottom: 10px; }
+        
+        .search-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            font-size: 1rem;
+            outline: none;
+        }
+        
+        .search-input:focus { border-color: #2d5a3d; }
+        
+        .search-hint {
+            font-size: 0.75rem;
+            color: #666;
+            margin-top: 5px;
+            padding: 8px;
+            background: #f5f5f5;
+            border-radius: 8px;
+            line-height: 1.8;
+        }
+        
+        .search-hint code {
+            background: #2d5a3d;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 15px;
+            overflow-x: auto;
+        }
+        
+        .tab {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 20px;
+            background: #f0f0f0;
+            color: #555;
+            font-size: 0.8rem;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        
+        .tab.active {
+            background: #2d5a3d;
+            color: white;
+        }
+        
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        .chart-container {
+            margin: 15px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .chart-title {
+            font-size: 0.9rem;
+            color: #2d5a3d;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        
+        .bar-chart {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .bar-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .bar-label {
+            width: 100px;
+            font-size: 0.8rem;
+            color: #555;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .bar-track {
+            flex: 1;
+            height: 20px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #2d5a3d, #4a7c59);
+            border-radius: 10px;
+            transition: width 0.5s;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 8px;
+        }
+        
+        .bar-value {
+            color: white;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+        
+        .cards-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 50vh;
+            overflow-y: auto;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border-right: 4px solid #2d5a3d;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .card:hover { transform: translateX(-3px); }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        
+        .card-number {
+            background: #2d5a3d;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+        
+        .card-name h3 {
+            color: #2d5a3d;
+            font-size: 0.95rem;
+            margin-bottom: 3px;
+        }
+        
+        .card-id {
+            color: #888;
+            font-size: 0.7rem;
+        }
+        
+        .card-badges {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+        
+        .badge {
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 0.65rem;
+        }
+        
+        .badge-green { background: #e8f5e9; color: #2d5a3d; }
+        .badge-orange { background: #fff3e0; color: #e65100; }
+        .badge-blue { background: #e3f2fd; color: #1565c0; }
+        .badge-purple { background: #f3e5f5; color: #7b1fa2; }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #888;
+        }
+        
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 25px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            background: #2d5a3d;
+            color: white;
+            width: 100%;
+            margin-top: 10px;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover { background: #1e3d2f; }
+        .btn:disabled { background: #ccc; cursor: not-allowed; }
+        
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+        
+        .btn-secondary:hover { background: #e0e0e0; }
+        
+        .hidden { display: none !important; }
+        
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 20px;
+        }
+        
+        .modal-overlay.show { display: flex; }
+        
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            max-width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            width: 100%;
+        }
+        
+        .detail-row {
+            display: flex;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .detail-label { width: 120px; color: #888; font-size: 0.8rem; }
+        .detail-value { flex: 1; color: #333; font-weight: 500; }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .stat-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .stat-card-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2d5a3d;
+        }
+        
+        .stat-card-label {
+            font-size: 0.75rem;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .column-preview {
+            background: #f0f7f0;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 0.8rem;
+        }
+        
+        .column-tag {
+            display: inline-block;
+            background: #2d5a3d;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 12px;
+            margin: 2px;
+            font-size: 0.75rem;
+        }
+        
+        .smart-detect {
+            background: #e8f5e9;
+            border: 1px solid #4caf50;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 0.85rem;
+            color: #2d5a3d;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #2d5a3d;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 كشف الشهداء</h1>
+            <p>نظام مرن - يتكيف مع أي تنسيق ملف</p>
+            <div class="stats-overview">
+                <div class="stat-box">
+                    <div class="stat-box-number" id="totalCount">0</div>
+                    <div class="stat-box-label">الإجمالي</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-box-number" id="filteredCount">0</div>
+                    <div class="stat-box-label">البحث</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-box-number" id="uniqueFamilies">0</div>
+                    <div class="stat-box-label">العائلات</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="upload-section" id="uploadSection">
+            <div class="upload-area" id="uploadArea">
+                <div style="font-size: 2.5rem; margin-bottom: 10px;">📁</div>
+                <div style="color: #2d5a3d; font-weight: bold; margin-bottom: 5px;">اضغط لرفع ملف Excel</div>
+                <div style="color: #888; font-size: 0.8rem;">أو اسحب الملف هنا</div>
+                <input type="file" id="fileInput" accept=".xlsx,.xls,.csv">
+            </div>
+        </div>
+        
+        <div class="mapping-section hidden" id="mappingSection">
+            <h2 style="color: #2d5a3d; margin-bottom: 10px; font-size: 1.1rem;">🔗 ربط الأعمدة</h2>
+            <p style="color: #666; font-size: 0.85rem; margin-bottom: 15px;">
+                تم اكتشاف <span id="detectedColumnsCount">0</span> عمود. حدد معنى كل عمود أو اتركه فارغاً:
+            </p>
+            
+            <div class="smart-detect hidden" id="smartDetectBox">
+                <strong>🤖 اكتشاف ذكي:</strong> <span id="smartDetectText"></span>
+            </div>
+            
+            <div class="column-preview" id="columnPreview"></div>
+            
+            <div class="mapping-grid" id="mappingGrid"></div>
+            
+            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                <button class="btn" id="confirmMappingBtn">✅ تأكيد واستمرار</button>
+                <button class="btn btn-secondary" id="resetMappingBtn">🔄 إعادة رفع</button>
+            </div>
+        </div>
+        
+        <div class="search-section hidden" id="searchSection">
+            <div class="search-box">
+                <input type="text" class="search-input" id="searchInput" placeholder="ابحث في جميع البيانات...">
+            </div>
+            <div class="search-hint">
+                <strong>🔍 دليل البحث المتقدم:</strong><br>
+                <code>محمد , 25</code> = "محمد" <strong>و</strong> "25"<br>
+                <code>محمد | أحمد</code> = "محمد" <strong>أو</strong> "أحمد"<br>
+                <code>محمد , -أحمد</code> = "محمد" <strong>بدون</strong> "أحمد"
+            </div>
+        </div>
+        
+        <div class="results-section hidden" id="resultsSection">
+            <div class="tabs">
+                <button class="tab active" data-tab="results">📋 النتائج</button>
+                <button class="tab" data-tab="stats">📊 الإحصائيات</button>
+                <button class="tab" data-tab="families">👥 العائلات</button>
+                <button class="tab" data-tab="columns">📑 الأعمدة</button>
+            </div>
+            
+            <div class="tab-content active" id="resultsTab">
+                <div style="margin-bottom: 10px; color: #666; font-size: 0.85rem;">
+                    عرض <span id="showingCount">0</span> من <span id="totalResults">0</span> نتيجة
+                </div>
+                <div class="cards-container" id="cardsContainer"></div>
+                <button class="btn" id="exportBtn">📥 تصدير النتائج</button>
+            </div>
+            
+            <div class="tab-content" id="statsTab">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-card-value" id="statTotal">0</div>
+                        <div class="stat-card-label">إجمالي الشهداء</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-value" id="statMales">0</div>
+                        <div class="stat-card-label">الذكور</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-value" id="statFemales">0</div>
+                        <div class="stat-card-label">الإناث</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-value" id="statMarried">0</div>
+                        <div class="stat-card-label">المتزوجون</div>
+                    </div>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-title">🏆 أكثر 10 عائلات</div>
+                    <div class="bar-chart" id="familiesChart"></div>
+                </div>
+                
+                <div class="chart-container" id="localityChartContainer">
+                    <div class="chart-title">📍 توزيع المحليات</div>
+                    <div class="bar-chart" id="localitiesChart"></div>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="familiesTab">
+                <div class="chart-container">
+                    <div class="chart-title">جميع العائلات</div>
+                    <div class="bar-chart" id="allFamiliesChart"></div>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="columnsTab">
+                <div class="chart-container">
+                    <div class="chart-title">📊 توزيع الأعمدة المختارة</div>
+                    <div id="columnsStats"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 2px solid #eee; padding-bottom: 10px;">
+                <h2 style="color: #2d5a3d;">تفاصيل السجل</h2>
+                <button onclick="closeModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
+            </div>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script>
+        // Global variables
+        let allData = [], filteredData = [], columns = [], rawHeaders = [];
+        let columnMapping = {};
+        
+        // Field definitions with Arabic keywords for smart detection
+        const fieldDefinitions = {
+            name: {
+                label: '👤 اسم الشهيد',
+                keywords: ['اسم', 'شهيد', 'الاسم', 'الشهيد', 'الاسم الرباعي', 'الاسم الثلاثي', 'الاسم الكامل'],
+                required: true
+            },
+            id: {
+                label: '🆔 رقم الهوية',
+                keywords: ['هوية', 'رقم', 'الهوية', 'رقم الهوية', 'الرقم', 'id', 'رقم السجل'],
+                required: false
+            },
+            age: {
+                label: '🎂 العمر',
+                keywords: ['عمر', 'العمر', 'age', 'السن', 'سن', 'تاريخ الميلاد', 'ميلاد'],
+                required: false
+            },
+            locality: {
+                label: '📍 المحلية',
+                keywords: ['محلية', 'المنطقة', 'منطقة', 'البلد', 'بلد', 'العنوان', 'عنوان', 'محافظة', 'المدينة', 'مدينة'],
+                required: false
+            },
+            status: {
+                label: '💍 الحالة الاجتماعية',
+                keywords: ['حالة', 'الحالة', 'اجتماعية', 'الحالة الاجتماعية', 'متزوج', 'اعزب', 'أعزب'],
+                required: false
+            },
+            gender: {
+                label: '⚧ الجنس',
+                keywords: ['جنس', 'الجنس', 'ذكر', 'انثى', 'أنثى'],
+                required: false
+            },
+            date: {
+                label: '📅 تاريخ الاستشهاد',
+                keywords: ['تاريخ', 'استشهاد', 'التاريخ', 'الاستشهاد', 'يوم', 'شهر', 'سنة'],
+                required: false
+            },
+            notes: {
+                label: '📝 ملاحظات',
+                keywords: ['ملاحظات', 'وصف', 'تفاصيل', 'ملاحظة'],
+                required: false
+            }
+        };
+        
+        // DOM elements
+        const fileInput = document.getElementById('fileInput');
+        const uploadArea = document.getElementById('uploadArea');
+        const searchInput = document.getElementById('searchInput');
+        const cardsContainer = document.getElementById('cardsContainer');
+        
+        // Event listeners
+        uploadArea.addEventListener('click', () => fileInput.click());
+        
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.style.background = '#e8f5e9';
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.style.background = '#f8faf8';
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.style.background = '#f8faf8';
+            if (e.dataTransfer.files.length > 0) handleFile(e.dataTransfer.files[0]);
+        });
+        
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) handleFile(e.target.files[0]);
+        });
+        
+        document.getElementById('confirmMappingBtn').addEventListener('click', confirmMapping);
+        document.getElementById('resetMappingBtn').addEventListener('click', resetUpload);
+        
+        // File handling
+        async function handleFile(file) {
+            try {
+                const data = await file.arrayBuffer();
+                const workbook = XLSX.read(data, { type: 'array' });
+                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+                
+                if (jsonData.length === 0) {
+                    alert('الملف فارغ!');
+                    return;
+                }
+                
+                rawHeaders = jsonData[0];
+                columns = rawHeaders.map((h, i) => h || 'عمود ' + (i + 1));
+                
+                // Process data
+                allData = [];
+                for (let i = 1; i < jsonData.length; i++) {
+                    const row = jsonData[i];
+                    if (row.length === 0) continue;
+                    
+                    const obj = { _id: i };
+                    columns.forEach((header, index) => {
+                        obj[header] = row[index] || '';
+                    });
+                    allData.push(obj);
+                }
+                
+                showMappingInterface();
+                
+            } catch (error) {
+                console.error(error);
+                alert('خطأ في قراءة الملف: ' + error.message);
+            }
+        }
+        
+        function showMappingInterface() {
+            document.getElementById('uploadSection').classList.add('hidden');
+            document.getElementById('mappingSection').classList.remove('hidden');
+            document.getElementById('detectedColumnsCount').textContent = columns.length;
+            
+            // Show column preview
+            const previewDiv = document.getElementById('columnPreview');
+            previewDiv.innerHTML = '<strong>الأعمدة الموجودة:</strong><br>' + 
+                columns.map(c => '<span class="column-tag">' + c + '</span>').join('');
+            
+            // Generate mapping grid
+            const grid = document.getElementById('mappingGrid');
+            grid.innerHTML = '';
+            
+            // Smart detection
+            const smartMapping = {};
+            let smartDetectCount = 0;
+            
+            Object.keys(fieldDefinitions).forEach(fieldKey => {
+                const field = fieldDefinitions[fieldKey];
+                const matchedColumn = columns.find(col => 
+                    field.keywords.some(keyword => 
+                        col.toLowerCase().includes(keyword.toLowerCase())
+                    )
+                );
+                
+                if (matchedColumn) {
+                    smartMapping[fieldKey] = matchedColumn;
+                    smartDetectCount++;
+                }
+            });
+            
+            if (smartDetectCount > 0) {
+                const smartBox = document.getElementById('smartDetectBox');
+                smartBox.classList.remove('hidden');
+                document.getElementById('smartDetectText').textContent = 
+                    'تم اكتشاف ' + smartDetectCount + ' عمود تلقائياً بناءً على أسماء الأعمدة';
+            }
+            
+            // Create mapping items
+            Object.keys(fieldDefinitions).forEach(fieldKey => {
+                const field = fieldDefinitions[fieldKey];
+                const div = document.createElement('div');
+                div.className = 'mapping-item';
+                
+                const select = document.createElement('select');
+                select.className = 'mapping-select';
+                select.style.pointerEvents = 'auto';
+
+select.dataset.field = fieldKey;
+                
+                // Empty option
+                const emptyOption = document.createElement('option');
+                emptyOption.value = '';
+                emptyOption.textContent = '-- اختر عمود --';
+                select.appendChild(emptyOption);
+                
+                // Column options
+                columns.forEach(col => {
+                    const option = document.createElement('option');
+                    option.value = col;
+                    option.textContent = col;
+                    if (smartMapping[fieldKey] === col) {
+                        option.selected = true;
+                    }
+                    select.appendChild(option);
+                });
+                
+                div.innerHTML = '<div class="mapping-label">' + field.label + 
+                    (field.required ? ' <span style="color: red;">*</span>' : '') + 
+                    '</div>';
+                div.appendChild(select);
+                
+                if (field.keywords.length > 0) {
+                    const hint = document.createElement('div');
+                    hint.className = 'mapping-hint';
+                    hint.textContent = 'كلمات مفتاحية: ' + field.keywords.join('، ');
+                    div.appendChild(hint);
+                }
+                
+                grid.appendChild(div);
+            });
+        }
+        
+        function confirmMapping() {
+            columnMapping = {};
+            const selects = document.querySelectorAll('.mapping-select');
+            let hasNameField = false;
+            
+            selects.forEach(select => {
+                const field = select.dataset.field;
+                const value = select.value;
+                if (value) {
+                    columnMapping[field] = value;
+                    if (field === 'name') hasNameField = true;
+                }
+            });
+            
+            if (!hasNameField) {
+                alert('يجب اختيار عمود لاسم الشهيد على الأقل!');
+                return;
+            }
+            
+            // Proceed to search interface
+            document.getElementById('mappingSection').classList.add('hidden');
+            document.getElementById('searchSection').classList.remove('hidden');
+            document.getElementById('resultsSection').classList.remove('hidden');
+            
+            filteredData = [...allData];
+            updateStats();
+            renderCards();
+            renderStats();
+        }
+        
+        function resetUpload() {
+            document.getElementById('mappingSection').classList.add('hidden');
+            document.getElementById('uploadSection').classList.remove('hidden');
+            fileInput.value = '';
+            allData = [];
+            filteredData = [];
+            columnMapping = {};
+        }
+        
+        // Search functionality
+        function advancedSearch(query) {
+            if (!query.trim()) return [...allData];
+            
+            const orParts = query.split('|').map(p => p.trim());
+            
+            return allData.filter(item => {
+                return orParts.some(part => {
+                    const andParts = part.split(',').map(p => p.trim());
+                    
+                    return andParts.every(condition => {
+                        const isNot = condition.startsWith('-');
+                        if (isNot) condition = condition.substring(1).trim();
+                        
+                        const found = Object.values(item).some(val => 
+                            String(val).toLowerCase().includes(condition.toLowerCase())
+                        );
+                        
+                        return isNot ? !found : found;
+                    });
+                });
+            });
+        }
+        
+        function search(query) {
+            filteredData = advancedSearch(query);
+            updateStats();
+            renderCards();
+        }
+        
+        function updateStats() {
+            document.getElementById('totalCount').textContent = allData.length;
+            document.getElementById('filteredCount').textContent = filteredData.length;
+            document.getElementById('showingCount').textContent = Math.min(filteredData.length, 50);
+            document.getElementById('totalResults').textContent = filteredData.length;
+            
+            // Calculate unique families
+            const families = new Set();
+            const nameCol = columnMapping.name;
+            if (nameCol) {
+                filteredData.forEach(item => {
+                    const name = String(item[nameCol] || '');
+                    const parts = name.split(/\s+/);
+                    if (parts.length > 1) {
+                        families.add(parts[parts.length - 1]);
+                    }
+                });
+            }
+            document.getElementById('uniqueFamilies').textContent = families.size;
+        }
+        
+        function renderCards() {
+            if (filteredData.length === 0) {
+                cardsContainer.innerHTML = '<div class="empty-state">لا توجد نتائج</div>';
+                return;
+            }
+            
+            const displayData = filteredData.slice(0, 50);
+            const nameCol = columnMapping.name;
+            const idCol = columnMapping.id;
+            const localityCol = columnMapping.locality;
+            const statusCol = columnMapping.status;
+            
+            cardsContainer.innerHTML = displayData.map(item => {
+                const name = nameCol ? (item[nameCol] || '-') : '-';
+                const id = idCol ? (item[idCol] || '-') : '';
+                const locality = localityCol ? (item[localityCol] || '-') : '-';
+                const status = statusCol ? (item[statusCol] || '-') : '-';
+                
+                let badges = '';
+                if (localityCol && item[localityCol]) {
+                    badges += '<span class="badge badge-green">' + locality + '</span>';
+                }
+                if (statusCol && item[statusCol]) {
+                    badges += '<span class="badge badge-orange">' + status + '</span>';
+                }
+                
+                return '<div class="card" onclick="showDetails(' + item._id + ')">' +
+                    '<div class="card-header">' +
+                    '<div class="card-number">' + item._id + '</div>' +
+                    '<div class="card-name"><h3>' + name + '</h3>' + 
+                    (id ? '<div class="card-id">' + id + '</div>' : '') + 
+                    '</div>' +
+                    '</div>' +
+                    '<div class="card-badges">' + badges + '</div></div>';
+            }).join('');
+        }
+        
+        function renderStats() {
+            document.getElementById('statTotal').textContent = allData.length;
+            
+            let males = 0, females = 0, married = 0;
+            const families = {};
+            const localities = {};
+            
+            const nameCol = columnMapping.name;
+            const genderCol = columnMapping.gender;
+            const statusCol = columnMapping.status;
+            const localityCol = columnMapping.locality;
+            
+            allData.forEach(item => {
+                // Gender detection
+                if (genderCol && item[genderCol]) {
+                    const gender = String(item[genderCol]).toLowerCase();
+                    if (gender.includes('ذكر') || gender.includes('male')) males++;
+                    else if (gender.includes('انثى') || gender.includes('أنثى') || gender.includes('female')) females++;
+                } else if (nameCol && item[nameCol]) {
+                    // Try to detect from name
+                    const name = String(item[nameCol]);
+                    if (name.match(/(ة|ه|ا|ى)$/)) females++;
+                    else males++;
+                }
+                
+                // Marital status
+                if (statusCol && item[statusCol]) {
+                    const status = String(item[statusCol]);
+                    if (status.includes('متزوج')) married++;
+                }
+                
+                // Families
+                if (nameCol && item[nameCol]) {
+                    const name = String(item[nameCol]);
+                    const parts = name.split(/\s+/);
+                    if (parts.length > 1) {
+                        const family = parts[parts.length - 1];
+                        families[family] = (families[family] || 0) + 1;
+                    }
+                }
+                
+                // Localities
+                if (localityCol && item[localityCol]) {
+                    const loc = String(item[localityCol]);
+                    localities[loc] = (localities[loc] || 0) + 1;
+                }
+            });
+            
+            document.getElementById('statMales').textContent = males;
+            document.getElementById('statFemales').textContent = females;
+            document.getElementById('statMarried').textContent = married;
+            
+            renderChart('familiesChart', Object.entries(families).sort((a,b) => b[1]-a[1]).slice(0, 10));
+            renderChart('allFamiliesChart', Object.entries(families).sort((a,b) => b[1]-a[1]));
+            
+            if (localityCol) {
+                renderChart('localitiesChart', Object.entries(localities).sort((a,b) => b[1]-a[1]));
+                document.getElementById('localityChartContainer').classList.remove('hidden');
+            } else {
+                document.getElementById('localityChartContainer').classList.add('hidden');
+            }
+            
+            // Columns stats
+            renderColumnsStats();
+        }
+        
+        function renderChart(containerId, data) {
+            if (data.length === 0) {
+                document.getElementById(containerId).innerHTML = '<div class="empty-state">لا توجد بيانات</div>';
+                return;
+            }
+            const max = Math.max(...data.map(d => d[1]));
+            document.getElementById(containerId).innerHTML = data.map(([label, value]) => 
+                '<div class="bar-item">' +
+                '<div class="bar-label" title="' + label + '">' + label + '</div>' +
+                '<div class="bar-track">' +
+                '<div class="bar-fill" style="width: ' + ((value/max)*100) + '%">' +
+                '<span class="bar-value">' + value + '</span>' +
+                '</div></div></div>'
+            ).join('');
+        }
+        
+        function renderColumnsStats() {
+            const container = document.getElementById('columnsStats');
+            let html = '<div style="display: grid; gap: 10px;">';
+            
+            Object.keys(columnMapping).forEach(field => {
+                const colName = columnMapping[field];
+                const fieldLabel = fieldDefinitions[field]?.label || field;
+                
+                // Count non-empty values
+                let count = 0;
+                allData.forEach(item => {
+                    if (item[colName] && String(item[colName]).trim() !== '') count++;
+                });
+                
+                const percentage = allData.length > 0 ? Math.round((count / allData.length) * 100) : 0;
+                
+                html += '<div style="background: white; padding: 10px; border-radius: 8px; border-right: 3px solid #2d5a3d;">' +
+                    '<div style="display: flex; justify-content: space-between; margin-bottom: 5px;">' +
+                    '<strong>' + fieldLabel + '</strong>' +
+                    '<span style="color: #2d5a3d;">' + count + ' / ' + allData.length + '</span>' +
+                    '</div>' +
+                    '<div style="background: #e0e0e0; height: 8px; border-radius: 4px; overflow: hidden;">' +
+                    '<div style="background: #2d5a3d; height: 100%; width: ' + percentage + '%;"></div>' +
+                    '</div>' +
+                    '<div style="font-size: 0.75rem; color: #888; margin-top: 3px;">' + percentage + '% مكتمل</div>' +
+                    '</div>';
+            });
+            
+            html += '</div>';
+            container.innerHTML = html;
+        }
+        
+        function showDetails(id) {
+            const item = allData.find(d => d._id === id);
+            if (!item) return;
+            
+            let html = '';
+            
+            // Show mapped fields first
+            Object.keys(columnMapping).forEach(field => {
+                const colName = columnMapping[field];
+                const fieldLabel = fieldDefinitions[field]?.label || field;
+                const value = item[colName] || '-';
+                html += '<div class="detail-row"><div class="detail-label">' + fieldLabel + 
+                       '</div><div class="detail-value">' + value + '</div></div>';
+            });
+            
+            // Show other columns
+            html += '<div style="margin: 15px 0; border-top: 2px solid #eee; padding-top: 10px;">' +
+                   '<strong style="color: #2d5a3d;">باقي الأعمدة:</strong></div>';
+            
+            Object.entries(item).forEach(([key, value]) => {
+                if (key !== '_id' && !Object.values(columnMapping).includes(key)) {
+                    html += '<div class="detail-row"><div class="detail-label">' + key + 
+                           '</div><div class="detail-value">' + (value || '-') + '</div></div>';
+                }
+            });
+            
+            document.getElementById('modalBody').innerHTML = html;
+            document.getElementById('modalOverlay').classList.add('show');
+        }
+        
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.remove('show');
+        }
+        
+        // Tabs
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.tab + 'Tab').classList.add('active');
+            });
+        });
+        
+        // Search input
+        searchInput.addEventListener('input', (e) => search(e.target.value));
+        
+        // Export
+        document.getElementById('exportBtn').addEventListener('click', () => {
+            const exportData = filteredData.map(({_id, ...rest}) => rest);
+            const ws = XLSX.utils.json_to_sheet(exportData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'النتائج');
+            XLSX.writeFile(wb, 'نتائج_البحث.xlsx');
+        });
+        
+        // Close modal on outside click
+        document.getElementById('modalOverlay').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('modalOverlay')) {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>
