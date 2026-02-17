@@ -8,21 +8,11 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <!-- Loading Screen -->
+    <!-- Loading Screen - تصميم جديد أنيق -->
     <div id="loadingScreen" class="loading-screen">
         <div class="loading-content">
-            <div class="loading-logo">
-                <svg viewBox="0 0 100 100" class="logo-svg">
-                    <circle cx="50" cy="50" r="45" fill="none" stroke="white" stroke-width="3"/>
-                    <path d="M50 25 L50 75 M25 50 L75 50" stroke="white" stroke-width="3" stroke-linecap="round"/>
-                    <circle cx="50" cy="50" r="15" fill="white"/>
-                </svg>
-            </div>
-            <div class="loading-text">كفالاتي</div>
-            <div class="loading-subtext">جاري التحميل...</div>
-            <div class="loading-bar">
-                <div class="loading-progress"></div>
-            </div>
+            <div class="loading-logo-text">كفالاتي</div>
+            <div class="loading-spinner-modern"></div>
         </div>
     </div>
 
@@ -37,9 +27,12 @@
             </button>
             <div class="user-welcome" style="justify-content: center; flex-direction: column; text-align: center;">
                 <div class="user-avatar" style="margin-bottom: 12px;">
+                    <!-- 👦 صبي -->
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                         <circle cx="12" cy="8" r="4"/>
-                        <path d="M4 20c0-4 4-6 8-6s8 2 8 6"/>
+                        <path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/>
+                        <path d="M12 2v2"/>
+                        <path d="M9 5h6"/>
                     </svg>
                 </div>
                 <div class="user-info">
@@ -104,32 +97,24 @@
                 <div id="suggestions" class="suggestions hidden"></div>
             </div>
 
-            <!-- Currency Selection -->
+            <!-- Currency Selection - أزرار جميلة -->
             <div class="form-group">
                 <label>العملة</label>
                 <div class="currency-selector">
-                    <label class="currency-option">
-                        <input type="radio" name="currency" value="ILS" checked>
-                        <span class="currency-box">
-                            <span class="currency-symbol">₪</span>
-                            <span class="currency-name">شيكل</span>
-                        </span>
-                    </label>
-                    <label class="currency-option">
-                        <input type="radio" name="currency" value="JOD">
-                        <span class="currency-box">
-                            <span class="currency-symbol">د.أ</span>
-                            <span class="currency-name">دينار</span>
-                        </span>
-                    </label>
-                    <label class="currency-option">
-                        <input type="radio" name="currency" value="USD">
-                        <span class="currency-box">
-                            <span class="currency-symbol">$</span>
-                            <span class="currency-name">دولار</span>
-                        </span>
-                    </label>
+                    <button type="button" class="currency-btn active" data-currency="ILS" onclick="selectCurrency('ILS')">
+                        <span class="currency-symbol">₪</span>
+                        <span class="currency-name">شيكل</span>
+                    </button>
+                    <button type="button" class="currency-btn" data-currency="JOD" onclick="selectCurrency('JOD')">
+                        <span class="currency-symbol">د.أ</span>
+                        <span class="currency-name">دينار</span>
+                    </button>
+                    <button type="button" class="currency-btn" data-currency="USD" onclick="selectCurrency('USD')">
+                        <span class="currency-symbol">$</span>
+                        <span class="currency-name">دولار</span>
+                    </button>
                 </div>
+                <input type="hidden" id="selectedCurrency" value="ILS">
             </div>
 
             <div class="form-group">
@@ -202,12 +187,6 @@
             'USD': '$'
         };
 
-        const currencyNames = {
-            'ILS': 'شيكل',
-            'JOD': 'دينار',
-            'USD': 'دولار'
-        };
-
         // Check auth and load data
         initAuth(async (user) => {
             if (!user) {
@@ -254,15 +233,15 @@
 
             // Display main total (ILS as default)
             const mainTotal = totals['ILS'];
-            totalElement.textContent = formatCurrency(mainTotal);
+            totalElement.textContent = formatCurrency(mainTotal) + ' ₪';
 
             // Display breakdown if there are other currencies
             let breakdownHtml = '';
             if (totals['JOD'] > 0) {
-                breakdownHtml += `<span style="margin-left: 12px;">${formatCurrency(totals['JOD'])} د.أ</span>`;
+                breakdownHtml += `<span style="margin-left: 12px;">${totals['JOD']} د.أ</span>`;
             }
             if (totals['USD'] > 0) {
-                breakdownHtml += `<span style="margin-left: 12px;">${formatCurrency(totals['USD'])} $</span>`;
+                breakdownHtml += `<span style="margin-left: 12px;">${totals['USD']} $</span>`;
             }
             breakdownElement.innerHTML = breakdownHtml;
 
@@ -281,9 +260,11 @@
                 html += `
                     <div class="kafala-item animate-fade-in">
                         <div class="kafala-icon">
+                            <!-- 💰 محفظة -->
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                <circle cx="12" cy="8" r="7"/>
-                                <polyline points="8 13 8 21 12 19 16 21 16 13"/>
+                                <path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"/>
+                                <path d="M4 6v12a2 2 0 0 0 2 2h14v-4"/>
+                                <path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z"/>
                             </svg>
                         </div>
                         <div class="kafala-details">
@@ -291,7 +272,7 @@
                             <div class="kafala-date">${formatDate(kafala.date)} ${kafala.notes ? '• ' + kafala.notes : ''}</div>
                         </div>
                         <div class="kafala-amount">
-                            ${kafala.amount} ${symbol}
+                            ${kafala.amount} <span style="font-size: 14px;">${symbol}</span>
                         </div>
                         <button class="btn-delete-icon" onclick="openDeleteModal('${kafala.id}')" title="حذف">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -310,10 +291,25 @@
             window.location.href = 'index.html';
         };
 
+        window.selectCurrency = function(currency) {
+            // Update hidden input
+            document.getElementById('selectedCurrency').value = currency;
+
+            // Update button styles
+            document.querySelectorAll('.currency-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.currency === currency) {
+                    btn.classList.add('active');
+                }
+            });
+        };
+
         window.openAddKafalaModal = function() {
             document.getElementById('addKafalaModal').classList.add('active');
             document.getElementById('kafalaDate').value = new Date().toISOString().split('T')[0];
             document.getElementById('kafalaOrg').focus();
+            // Reset currency to default
+            selectCurrency('ILS');
         };
 
         window.closeAddKafalaModal = function() {
@@ -322,8 +318,6 @@
             document.getElementById('kafalaAmount').value = '';
             document.getElementById('kafalaNotes').value = '';
             document.getElementById('suggestions').classList.add('hidden');
-            // Reset currency to default
-            document.querySelector('input[name="currency"][value="ILS"]').checked = true;
         };
 
         window.showSuggestions = function() {
@@ -357,7 +351,7 @@
             const amount = document.getElementById('kafalaAmount').value;
             const date = document.getElementById('kafalaDate').value;
             const notes = document.getElementById('kafalaNotes').value.trim();
-            const currency = document.querySelector('input[name="currency"]:checked').value;
+            const currency = document.getElementById('selectedCurrency').value;
 
             const success = await addKafala(childId, org, amount, date, notes, currency);
             if (success) {

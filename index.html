@@ -10,26 +10,16 @@
     <link rel="apple-touch-icon" href="icon-192x192.png">
 </head>
 <body>
-    <!-- Loading Screen -->
+    <!-- Loading Screen - تصميم جديد أنيق -->
     <div id="loadingScreen" class="loading-screen">
         <div class="loading-content">
-            <div class="loading-logo">
-                <svg viewBox="0 0 100 100" class="logo-svg">
-                    <circle cx="50" cy="50" r="45" fill="none" stroke="white" stroke-width="3"/>
-                    <path d="M50 25 L50 75 M25 50 L75 50" stroke="white" stroke-width="3" stroke-linecap="round"/>
-                    <circle cx="50" cy="50" r="15" fill="white"/>
-                </svg>
-            </div>
-            <div class="loading-text">كفالاتي</div>
-            <div class="loading-subtext">جاري التحميل...</div>
-            <div class="loading-bar">
-                <div class="loading-progress"></div>
-            </div>
+            <div class="loading-logo-text">كفالاتي</div>
+            <div class="loading-spinner-modern"></div>
         </div>
     </div>
 
     <div class="container">
-        <!-- Header -->
+        <!-- Header مع اسم المستخدم -->
         <div class="header">
             <button class="logout-btn" onclick="handleLogout()">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -68,9 +58,9 @@
         <div id="emptyState" class="empty-state hidden">
             <div class="empty-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                    <path d="M12 2a10 10 0 1 0 10 10H12V2z"/>
-                    <path d="M12 2a10 10 0 0 1 10 10"/>
-                    <circle cx="12" cy="12" r="3"/>
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M12 8v8"/>
+                    <path d="M8 12h8"/>
                 </svg>
             </div>
             <p>لا يوجد أطفال مسجلين</p>
@@ -203,9 +193,12 @@
                     <div class="card child-card animate-fade-in">
                         <div class="child-content" onclick="goToChild('${child.id}')">
                             <div class="child-avatar">
+                                <!-- 👦 صبي -->
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                                     <circle cx="12" cy="8" r="4"/>
-                                    <path d="M4 20c0-4 4-6 8-6s8 2 8 6"/>
+                                    <path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/>
+                                    <path d="M12 2v2"/>
+                                    <path d="M9 5h6"/>
                                 </svg>
                             </div>
                             <div class="child-info">
