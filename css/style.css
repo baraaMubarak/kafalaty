@@ -2,17 +2,21 @@
 :root {
     --primary: #667eea;
     --primary-dark: #764ba2;
+    --primary-light: #8b5cf6;
     --success: #10b981;
     --danger: #ef4444;
+    --danger-light: #fef2f2;
     --warning: #f59e0b;
     --info: #3b82f6;
     --dark: #1f2937;
+    --gray: #6b7280;
     --light: #f3f4f6;
     --white: #ffffff;
     --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-    --radius: 16px;
-    --radius-sm: 8px;
+    --shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    --radius: 20px;
+    --radius-sm: 12px;
 }
 
 /* ===== Reset & Base ===== */
@@ -30,7 +34,7 @@ body {
     line-height: 1.6;
 }
 
-/* ===== Loading Screen ===== */
+/* ===== Loading Screen - تصميم جديد ===== */
 .loading-screen {
     position: fixed;
     top: 0;
@@ -39,55 +43,75 @@ body {
     bottom: 0;
     background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
     z-index: 9999;
-    transition: opacity 0.5s ease;
+    transition: opacity 0.5s ease, visibility 0.5s;
 }
 
 .loading-screen.hidden {
     opacity: 0;
-    pointer-events: none;
+    visibility: hidden;
+}
+
+.loading-content {
+    text-align: center;
+    padding: 40px;
 }
 
 .loading-logo {
-    width: 80px;
-    height: 80px;
-    background: var(--white);
-    border-radius: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 40px;
-    margin-bottom: 24px;
-    animation: pulse 2s infinite;
-    box-shadow: var(--shadow-lg);
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 30px;
+    position: relative;
 }
 
-@keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
+.logo-svg {
+    width: 100%;
+    height: 100%;
+    animation: pulse-scale 2s ease-in-out infinite;
 }
 
-.loading-spinner {
-    width: 48px;
-    height: 48px;
-    border: 4px solid rgba(255,255,255,0.3);
-    border-top-color: var(--white);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
+@keyframes pulse-scale {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.1); opacity: 0.9; }
 }
 
 .loading-text {
     color: var(--white);
-    margin-top: 16px;
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    letter-spacing: -1px;
+}
+
+.loading-subtext {
+    color: rgba(255,255,255,0.8);
     font-size: 16px;
-    opacity: 0.9;
+    margin-bottom: 30px;
+}
+
+.loading-bar {
+    width: 200px;
+    height: 4px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 2px;
+    margin: 0 auto;
+    overflow: hidden;
+}
+
+.loading-progress {
+    height: 100%;
+    width: 0%;
+    background: var(--white);
+    border-radius: 2px;
+    animation: loading-progress 2s ease-in-out infinite;
+}
+
+@keyframes loading-progress {
+    0% { width: 0%; margin-left: 0%; }
+    50% { width: 100%; margin-left: 0%; }
+    100% { width: 0%; margin-left: 100%; }
 }
 
 /* ===== Toast Notifications ===== */
@@ -107,8 +131,8 @@ body {
 .toast {
     background: var(--white);
     padding: 16px 20px;
-    border-radius: var(--radius);
-    box-shadow: var(--shadow-lg);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-xl);
     display: flex;
     align-items: center;
     gap: 12px;
@@ -137,7 +161,7 @@ body {
 
 .toast-message {
     font-size: 13px;
-    color: #6b7280;
+    color: var(--gray);
 }
 
 .toast-close {
@@ -145,7 +169,7 @@ body {
     border: none;
     font-size: 20px;
     cursor: pointer;
-    color: #9ca3af;
+    color: var(--gray);
     padding: 0;
     width: 24px;
     height: 24px;
@@ -155,14 +179,8 @@ body {
 }
 
 @keyframes slideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .toast.hiding {
@@ -170,10 +188,7 @@ body {
 }
 
 @keyframes slideUp {
-    to {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
+    to { opacity: 0; transform: translateY(-20px); }
 }
 
 /* ===== Container ===== */
@@ -184,31 +199,14 @@ body {
     min-height: 100vh;
 }
 
-/* ===== Header ===== */
+/* ===== Header - تصميم جديد مع اسم المستخدم ===== */
 .header {
     background: var(--white);
     border-radius: var(--radius);
     padding: 24px;
     margin-bottom: 20px;
     box-shadow: var(--shadow);
-    text-align: center;
     position: relative;
-}
-
-.header-icon {
-    font-size: 48px;
-    margin-bottom: 12px;
-}
-
-.header h1 {
-    font-size: 24px;
-    color: var(--dark);
-    margin-bottom: 4px;
-}
-
-.header p {
-    color: #6b7280;
-    font-size: 14px;
 }
 
 .logout-btn {
@@ -217,16 +215,67 @@ body {
     left: 16px;
     background: var(--light);
     border: none;
-    padding: 8px 16px;
+    padding: 8px 14px;
     border-radius: 20px;
-    font-size: 12px;
+    font-size: 13px;
     cursor: pointer;
-    color: var(--dark);
+    color: var(--gray);
     transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
 .logout-btn:hover {
     background: #e5e7eb;
+    color: var(--dark);
+}
+
+.logout-btn svg {
+    width: 14px;
+    height: 14px;
+}
+
+/* User Welcome Section */
+.user-welcome {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding-top: 8px;
+}
+
+.user-avatar {
+    width: 56px;
+    height: 56px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    flex-shrink: 0;
+}
+
+.user-avatar svg {
+    width: 28px;
+    height: 28px;
+}
+
+.user-info {
+    flex: 1;
+}
+
+.user-greeting {
+    font-size: 14px;
+    color: var(--gray);
+    margin-bottom: 4px;
+}
+
+.user-name {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--dark);
+    letter-spacing: -0.5px;
 }
 
 /* ===== Cards ===== */
@@ -245,41 +294,68 @@ body {
 
 /* ===== Stats ===== */
 .stats-card {
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.1) 100%);
+    backdrop-filter: blur(10px);
     color: var(--white);
     text-align: center;
+    border: 1px solid rgba(255,255,255,0.2);
+}
+
+.stats-label {
+    font-size: 14px;
+    opacity: 0.9;
+    margin-bottom: 8px;
 }
 
 .stats-amount {
     font-size: 36px;
     font-weight: 700;
-    margin: 8px 0;
 }
 
-.stats-label {
-    opacity: 0.9;
-    font-size: 14px;
-}
-
-/* ===== Child Card (Main Page) ===== */
+/* ===== Child Card - تصميم جديد ===== */
 .child-card {
     display: flex;
     align-items: center;
+    gap: 12px;
+    padding: 16px;
+    position: relative;
+    overflow: hidden;
+}
+
+.child-card::before {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(to bottom, var(--primary), var(--primary-dark));
+    border-radius: 2px;
+}
+
+.child-content {
+    display: flex;
+    align-items: center;
     gap: 16px;
+    flex: 1;
     cursor: pointer;
-    border-right: 4px solid var(--primary);
 }
 
 .child-avatar {
-    width: 56px;
-    height: 56px;
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    width: 52px;
+    height: 52px;
+    background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 28px;
+    color: var(--primary);
     flex-shrink: 0;
+}
+
+.child-avatar svg {
+    width: 28px;
+    height: 28px;
 }
 
 .child-info {
@@ -289,31 +365,76 @@ body {
 .child-name {
     font-size: 18px;
     font-weight: 600;
+    color: var(--dark);
     margin-bottom: 4px;
 }
 
+.child-meta {
+    font-size: 13px;
+    color: var(--gray);
+}
+
 .child-total {
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 700;
     color: var(--success);
+    text-align: left;
 }
 
 .child-arrow {
-    font-size: 24px;
-    color: #9ca3af;
+    color: var(--gray);
+    opacity: 0.5;
+}
+
+/* Delete Button - تصميم جديد أنيق */
+.btn-delete-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: var(--light);
+    color: var(--gray);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+.btn-delete-icon:hover {
+    background: var(--danger-light);
+    color: var(--danger);
+    transform: scale(1.1);
+}
+
+.btn-delete-icon:active {
+    transform: scale(0.95);
+}
+
+.btn-delete-icon svg {
+    width: 16px;
+    height: 16px;
 }
 
 /* ===== Empty State ===== */
 .empty-state {
     text-align: center;
     padding: 48px 20px;
-    color: #6b7280;
+    color: var(--gray);
 }
 
 .empty-icon {
-    font-size: 64px;
-    margin-bottom: 16px;
-    opacity: 0.5;
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 20px;
+    color: var(--primary);
+    opacity: 0.3;
+}
+
+.empty-icon svg {
+    width: 100%;
+    height: 100%;
 }
 
 /* ===== Forms ===== */
@@ -348,7 +469,7 @@ input:focus, select:focus {
 /* ===== Buttons ===== */
 .btn {
     width: 100%;
-    padding: 16px;
+    padding: 14px;
     border: none;
     border-radius: var(--radius-sm);
     font-size: 16px;
@@ -369,25 +490,33 @@ input:focus, select:focus {
 .btn-primary {
     background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
     color: var(--white);
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
 }
 
 .btn-success {
-    background: var(--success);
+    background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
     color: var(--white);
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
 }
 
 .btn-danger {
-    background: var(--danger);
+    background: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%);
     color: var(--white);
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
 }
 
 .btn-secondary {
     background: var(--light);
-    color: var(--dark);
+    color: var(--gray);
+}
+
+.btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
 }
 
 .btn:active {
-    transform: scale(0.98);
+    transform: translateY(0);
 }
 
 .btn-fab {
@@ -396,9 +525,9 @@ input:focus, select:focus {
     left: 50%;
     transform: translateX(-50%);
     width: auto;
-    padding: 16px 32px;
+    padding: 16px 28px;
     border-radius: 50px;
-    box-shadow: var(--shadow-lg);
+    box-shadow: var(--shadow-xl);
     z-index: 100;
 }
 
@@ -415,60 +544,18 @@ input:focus, select:focus {
     flex: 1;
     padding: 12px;
     text-align: center;
-    border-radius: var(--radius-sm);
+    border-radius: 10px;
     cursor: pointer;
     font-size: 14px;
     font-weight: 500;
     transition: all 0.2s;
-    color: #6b7280;
+    color: var(--gray);
 }
 
 .tab.active {
     background: var(--white);
     color: var(--primary);
     box-shadow: var(--shadow);
-}
-
-/* ===== Kafala List ===== */
-.kafala-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 16px;
-    background: var(--light);
-    border-radius: var(--radius-sm);
-    margin-bottom: 12px;
-}
-
-.kafala-icon {
-    width: 40px;
-    height: 40px;
-    background: var(--white);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
-}
-
-.kafala-details {
-    flex: 1;
-}
-
-.kafala-org {
-    font-weight: 600;
-    margin-bottom: 2px;
-}
-
-.kafala-date {
-    font-size: 12px;
-    color: #6b7280;
-}
-
-.kafala-amount {
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--success);
 }
 
 /* ===== Modal ===== */
@@ -513,20 +600,102 @@ input:focus, select:focus {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 24px;
 }
 
 .modal-title {
     font-size: 20px;
-    font-weight: 600;
+    font-weight: 700;
+    color: var(--dark);
 }
 
 .modal-close {
-    background: none;
+    background: var(--light);
     border: none;
-    font-size: 24px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
     cursor: pointer;
-    color: #9ca3af;
+    color: var(--gray);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.modal-close:hover {
+    background: #e5e7eb;
+    color: var(--dark);
+}
+
+.modal-close svg {
+    width: 18px;
+    height: 18px;
+}
+
+/* ===== Confirm Modal - تصميم جديد للحذف ===== */
+.modal-confirm {
+    align-items: center;
+    padding: 20px;
+}
+
+.confirm-content {
+    border-radius: var(--radius);
+    text-align: center;
+    padding: 40px 24px;
+    transform: scale(0.9);
+    transition: transform 0.3s;
+}
+
+.modal-confirm.active .confirm-content {
+    transform: scale(1);
+}
+
+.confirm-icon {
+    width: 72px;
+    height: 72px;
+    background: var(--danger-light);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    color: var(--danger);
+}
+
+.confirm-icon svg {
+    width: 36px;
+    height: 36px;
+}
+
+.confirm-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--dark);
+    margin-bottom: 12px;
+}
+
+.confirm-text {
+    font-size: 16px;
+    color: var(--gray);
+    margin-bottom: 8px;
+    line-height: 1.5;
+}
+
+.confirm-warning {
+    font-size: 13px;
+    color: var(--danger);
+    margin-bottom: 24px;
+}
+
+.confirm-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.confirm-buttons .btn {
+    margin: 0;
 }
 
 /* ===== Suggestions ===== */
@@ -539,7 +708,7 @@ input:focus, select:focus {
     position: absolute;
     width: 100%;
     z-index: 100;
-    box-shadow: var(--shadow);
+    box-shadow: var(--shadow-lg);
     margin-top: 4px;
 }
 
@@ -587,7 +756,70 @@ input:focus, select:focus {
         padding: 20px;
     }
 
+    .user-name {
+        font-size: 20px;
+    }
+
     .stats-amount {
         font-size: 28px;
     }
+
+    .confirm-content {
+        padding: 32px 20px;
+    }
+}
+
+
+/* ===== Currency Selector - اختيار العملة ===== */
+.currency-selector {
+    display: flex;
+    gap: 10px;
+}
+
+.currency-option {
+    flex: 1;
+    cursor: pointer;
+}
+
+.currency-option input {
+    display: none;
+}
+
+.currency-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 16px 8px;
+    background: var(--light);
+    border: 2px solid transparent;
+    border-radius: var(--radius-sm);
+    transition: all 0.2s;
+    text-align: center;
+}
+
+.currency-option input:checked + .currency-box {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: white;
+    border-color: var(--primary);
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.currency-symbol {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.currency-name {
+    font-size: 12px;
+    font-weight: 500;
+}
+
+/* ===== Stats Breakdown ===== */
+.stats-breakdown {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
 }
