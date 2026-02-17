@@ -5,76 +5,47 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#667eea">
     <title>كفالاتي - تفاصيل الطفل</title>
-    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <!-- Loading Screen -->
     <div id="loadingScreen" class="loading-screen">
-        <div class="loading-content">
-            <div class="loading-logo-text">كفالاتي</div>
-            <div class="loading-spinner-modern"></div>
-        </div>
+        <div class="loading-logo">💚</div>
+        <div class="loading-spinner"></div>
+        <div class="loading-text">جاري التحميل...</div>
     </div>
 
     <div class="container">
         <!-- Header -->
         <div class="header">
-            <button class="logout-btn" onclick="goBack()">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="15 18 9 12 15 6"/>
-                </svg>
-                رجوع
-            </button>
-            <div class="user-welcome" style="justify-content: center; flex-direction: column; text-align: center;">
-                <div class="user-avatar" style="margin-bottom: 12px;">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                        <circle cx="12" cy="8" r="4"/>
-                        <path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/>
-                        <path d="M12 2v2"/>
-                        <path d="M9 5h6"/>
-                    </svg>
-                </div>
-                <div class="user-info">
-                    <div class="user-name" id="childName">...</div>
-                    <div class="user-greeting" id="childInfo">جاري التحميل...</div>
-                </div>
-            </div>
+            <button class="logout-btn" onclick="goBack()">رجوع</button>
+            <div class="header-icon">👶</div>
+            <h1 id="childName">اسم الطفل</h1>
+            <p id="childInfo">العمر: --</p>
         </div>
 
         <!-- Stats -->
         <div class="card stats-card">
             <div class="stats-label">إجمالي الكفالات</div>
             <div class="stats-amount" id="childTotal">0 ₪</div>
-            <div class="stats-breakdown" id="statsBreakdown" style="margin-top: 12px; font-size: 13px; opacity: 0.9;"></div>
         </div>
 
         <!-- Kafalat List -->
         <div class="card">
-            <h3 style="margin-bottom: 20px; color: var(--dark); font-size: 18px; font-weight: 600;">سجل الكفالات</h3>
+            <h3 style="margin-bottom: 16px; color: var(--dark);">سجل الكفالات</h3>
             <div id="kafalatList">
                 <!-- Kafalat will be loaded here -->
             </div>
             <div id="emptyKafalat" class="empty-state hidden">
-                <div class="empty-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                        <rect x="3" y="3" width="18" height="18" rx="2"/>
-                        <line x1="9" y1="9" x2="15" y2="9"/>
-                        <line x1="9" y1="13" x2="15" y2="13"/>
-                        <line x1="9" y1="17" x2="11" y2="17"/>
-                    </svg>
-                </div>
+                <div class="empty-icon">📝</div>
                 <p>لا توجد كفالات مسجلة</p>
-                <p class="mb-4">اضغط الزر أدناه لإضافة كفالة</p>
             </div>
         </div>
     </div>
 
     <!-- Add Kafala FAB -->
     <button class="btn btn-success btn-fab" onclick="openAddKafalaModal()">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="12" y1="5" x2="12" y2="19"/>
-            <line x1="5" y1="12" x2="19" y2="12"/>
-        </svg>
+        <span>+</span>
         <span>إضافة كفالة</span>
     </button>
 
@@ -83,41 +54,15 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3 class="modal-title">إضافة كفالة جديدة</h3>
-                <button class="modal-close" onclick="closeAddKafalaModal()">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="18" y1="6" x2="6" y2="18"/>
-                        <line x1="6" y1="6" x2="18" y2="18"/>
-                    </svg>
-                </button>
+                <button class="modal-close" onclick="closeAddKafalaModal()">×</button>
             </div>
             <div class="form-group" style="position: relative;">
                 <label>الجهة الكافلة</label>
                 <input type="text" id="kafalaOrg" placeholder="اختر أو اكتب جهة جديدة" autocomplete="off" oninput="showSuggestions()">
                 <div id="suggestions" class="suggestions hidden"></div>
             </div>
-
-            <!-- Currency Selection -->
             <div class="form-group">
-                <label>العملة</label>
-                <div class="currency-selector">
-                    <button type="button" class="currency-btn active" data-currency="ILS" onclick="selectCurrency('ILS')">
-                        <span class="currency-symbol">₪</span>
-                        <span class="currency-name">شيكل</span>
-                    </button>
-                    <button type="button" class="currency-btn" data-currency="JOD" onclick="selectCurrency('JOD')">
-                        <span class="currency-symbol">د.أ</span>
-                        <span class="currency-name">دينار</span>
-                    </button>
-                    <button type="button" class="currency-btn" data-currency="USD" onclick="selectCurrency('USD')">
-                        <span class="currency-symbol">$</span>
-                        <span class="currency-name">دولار</span>
-                    </button>
-                </div>
-                <input type="hidden" id="selectedCurrency" value="ILS">
-            </div>
-
-            <div class="form-group">
-                <label>المبلغ</label>
+                <label>المبلغ (₪)</label>
                 <input type="number" id="kafalaAmount" placeholder="أدخل المبلغ">
             </div>
             <div class="form-group">
@@ -130,26 +75,6 @@
             </div>
             <button class="btn btn-success" onclick="handleAddKafala()">حفظ الكفالة</button>
             <button class="btn btn-secondary mt-4" onclick="closeAddKafalaModal()">إلغاء</button>
-        </div>
-    </div>
-
-    <!-- Delete Confirmation Modal -->
-    <div id="deleteModal" class="modal modal-confirm">
-        <div class="modal-content confirm-content">
-            <div class="confirm-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10"/>
-                    <line x1="12" y1="8" x2="12" y2="12"/>
-                    <line x1="12" y1="16" x2="12.01" y2="16"/>
-                </svg>
-            </div>
-            <h3 class="confirm-title">تأكيد الحذف</h3>
-            <p class="confirm-text">هل أنت متأكدة من حذف هذه الكفالة؟</p>
-            <p class="confirm-warning">لا يمكن التراجع عن هذا الإجراء</p>
-            <div class="confirm-buttons">
-                <button class="btn btn-danger" id="confirmDeleteBtn">نعم، احذف</button>
-                <button class="btn btn-secondary" onclick="closeDeleteModal()">إلغاء</button>
-            </div>
         </div>
     </div>
 
@@ -177,14 +102,8 @@
         }
 
         let organizations = [];
-        let kafalaToDelete = null;
 
-        const currencySymbols = {
-            'ILS': '₪',
-            'JOD': 'د.أ',
-            'USD': '$'
-        };
-
+        // Check auth and load data
         initAuth(async (user) => {
             if (!user) {
                 window.location.href = 'login.html';
@@ -196,7 +115,7 @@
         });
 
         async function loadChildData() {
-            showLoading();
+            showLoading('جاري تحميل البيانات...');
             try {
                 const childDoc = await getDoc(doc(db, 'users', auth.currentUser.uid, 'children', childId));
                 if (!childDoc.exists()) {
@@ -219,25 +138,10 @@
             const listContainer = document.getElementById('kafalatList');
             const emptyState = document.getElementById('emptyKafalat');
             const totalElement = document.getElementById('childTotal');
-            const breakdownElement = document.getElementById('statsBreakdown');
 
-            let totals = { 'ILS': 0, 'JOD': 0, 'USD': 0 };
-            kafalat.forEach(k => {
-                const currency = k.currency || 'ILS';
-                totals[currency] += k.amount;
-            });
-
-            const mainTotal = totals['ILS'];
-            totalElement.textContent = formatCurrency(mainTotal) + ' ₪';
-
-            let breakdownHtml = '';
-            if (totals['JOD'] > 0) {
-                breakdownHtml += `<span style="margin-left: 12px;">${totals['JOD']} د.أ</span>`;
-            }
-            if (totals['USD'] > 0) {
-                breakdownHtml += `<span style="margin-left: 12px;">${totals['USD']} $</span>`;
-            }
-            breakdownElement.innerHTML = breakdownHtml;
+            let total = 0;
+            kafalat.forEach(k => total += k.amount);
+            totalElement.textContent = formatCurrency(total);
 
             if (kafalat.length === 0) {
                 listContainer.innerHTML = '';
@@ -249,30 +153,15 @@
 
             let html = '';
             kafalat.forEach(kafala => {
-                const currency = kafala.currency || 'ILS';
-                const symbol = currencySymbols[currency];
                 html += `
                     <div class="kafala-item animate-fade-in">
-                        <div class="kafala-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                <path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"/>
-                                <path d="M4 6v12a2 2 0 0 0 2 2h14v-4"/>
-                                <path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z"/>
-                            </svg>
-                        </div>
+                        <div class="kafala-icon">💰</div>
                         <div class="kafala-details">
                             <div class="kafala-org">${kafala.organization}</div>
                             <div class="kafala-date">${formatDate(kafala.date)} ${kafala.notes ? '• ' + kafala.notes : ''}</div>
                         </div>
-                        <div class="kafala-amount">
-                            ${kafala.amount} <span style="font-size: 14px;">${symbol}</span>
-                        </div>
-                        <button class="btn-delete-icon" onclick="openDeleteModal('${kafala.id}')" title="حذف">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="3 6 5 6 21 6"/>
-                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-                            </svg>
-                        </button>
+                        <div class="kafala-amount">${formatCurrency(kafala.amount)}</div>
+                        <button class="btn-small btn-danger" onclick="handleDeleteKafala('${kafala.id}')">حذف</button>
                     </div>
                 `;
             });
@@ -284,21 +173,10 @@
             window.location.href = 'index.html';
         };
 
-        window.selectCurrency = function(currency) {
-            document.getElementById('selectedCurrency').value = currency;
-            document.querySelectorAll('.currency-btn').forEach(btn => {
-                btn.classList.remove('active');
-                if (btn.dataset.currency === currency) {
-                    btn.classList.add('active');
-                }
-            });
-        };
-
         window.openAddKafalaModal = function() {
             document.getElementById('addKafalaModal').classList.add('active');
             document.getElementById('kafalaDate').value = new Date().toISOString().split('T')[0];
             document.getElementById('kafalaOrg').focus();
-            selectCurrency('ILS');
         };
 
         window.closeAddKafalaModal = function() {
@@ -340,43 +218,25 @@
             const amount = document.getElementById('kafalaAmount').value;
             const date = document.getElementById('kafalaDate').value;
             const notes = document.getElementById('kafalaNotes').value.trim();
-            const currency = document.getElementById('selectedCurrency').value;
 
-            const success = await addKafala(childId, org, amount, date, notes, currency);
+            const success = await addKafala(childId, org, amount, date, notes);
             if (success) {
                 closeAddKafalaModal();
                 await loadKafalatList();
             }
         };
 
-        window.openDeleteModal = function(kafalaId) {
-            kafalaToDelete = kafalaId;
-            document.getElementById('deleteModal').classList.add('active');
-        };
-
-        window.closeDeleteModal = function() {
-            kafalaToDelete = null;
-            document.getElementById('deleteModal').classList.remove('active');
-        };
-
-        document.getElementById('confirmDeleteBtn').addEventListener('click', async function() {
-            if (kafalaToDelete) {
-                closeDeleteModal();
-                const success = await deleteKafala(childId, kafalaToDelete);
-                if (success) {
-                    await loadKafalatList();
-                }
+        window.handleDeleteKafala = async function(kafalaId) {
+            const success = await deleteKafala(childId, kafalaId);
+            if (success) {
+                await loadKafalatList();
             }
-        });
+        };
 
-        document.querySelectorAll('.modal').forEach(modal => {
-            modal.addEventListener('click', function(e) {
-                if (e.target === this) {
-                    this.classList.remove('active');
-                }
-            });
+        // Close modal on outside click
+        document.getElementById('addKafalaModal').addEventListener('click', function(e) {
+            if (e.target === this) closeAddKafalaModal();
         });
     </script>
 </body>
 </html>
-
