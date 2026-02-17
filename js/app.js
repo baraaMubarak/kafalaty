@@ -239,42 +239,74 @@ export async function loadChildren() {
 }
 
 // ===== Kafala Functions =====
-export async function addKafala(childId, org, amount, date, notes) {
-    if (!org || !amount || !date) {
-        showToast('خطأ', 'الرجاء ملء جميع الحقول المطلوبة', 'error');
-        return false;
-    }
 
-    showLoading('جاري حفظ الكفالة...');
-
+// إضافة كفالة مع العملة
+export async function addKafala(childId, organization, amount, date, notes, currency = 'ILS') {
     try {
-        await addDoc(collection(db, 'users', auth.currentUser.uid, 'children', childId, 'kafalat'), {
-            organization: org,
-            amount: parseFloat(amount),
-            date: date,
-            notes: notes || '',
-            createdAt: new Date().toISOString()
-        });
+        showLoading();
+        
+        if (!organization || !amount || !date) {
+            hideLoading();
+            showToast('تنبيه', 'الرجاء ملء جميع الحقول المطلوبة', 'warning');
+            return null;
+        }
 
+        const kafalaData = {
+            organization: organization.trim(),
+            amount: Number(amount),
+            currency: currency,
+            date: date,
+            notes: notes ? notes.trim() : '',
+            createdAt: new Date().toISOString()
+        };
+        
+        const docRef = await addDoc(
+            collection(db, 'users', auth.currentUser.uid, 'children', childId, 'kafalat'), 
+            kafalaData
+        );
+        
         hideLoading();
-        showToast('تم بنجاح', 'تم إضافة الكفالة', 'success');
-        return true;
+        showToast('تم', 'تم إضافة الكفالة بنجاح', 'success');
+        return docRef.id;
     } catch (error) {
         hideLoading();
-        showToast('خطأ', 'حدث خطأ أثناء الحفظ', 'error');
-        return false;
+        showToast('خطأ', error.message, 'error');
+        return null;
     }
 }
 
-export async function deleteKafala(childId, kafalaId) {
-    if (!confirm('هل أنت متأكد من حذف هذه الكفالة؟')) return false;
-
-    showLoading('جاري الحذف...');
-
+// تحميل الكفالات
+export async function loadKafalat(childId) {
     try {
+        const q = query(
+            collection(db, 'users', auth.currentUser.uid, 'children', childId, 'kafalat'),
+            orderBy('date', 'desc')
+        );
+        
+        const snapshot = await getDocs(q);
+        const kafalat = [];
+        
+        snapshot.forEach(doc => {
+            kafalat.push({
+                id: doc.id,
+                ...doc.data()
+            });
+        });
+        
+        return kafalat;
+    } catch (error) {
+        showToast('خطأ', 'حدث خطأ في تحميل البيانات', 'error');
+        return [];
+    }
+}
+
+// حذف كفالة
+export async function deleteKafala(childId, kafalaId) {
+    try {
+        showLoading();
         await deleteDoc(doc(db, 'users', auth.currentUser.uid, 'children', childId, 'kafalat', kafalaId));
         hideLoading();
-        showToast('تم', 'تم حذف الكفالة', 'success');
+        showToast('تم', 'تم حذف الكفالة بنجاح', 'success');
         return true;
     } catch (error) {
         hideLoading();
@@ -283,31 +315,7 @@ export async function deleteKafala(childId, kafalaId) {
     }
 }
 
-export async function loadKafalat(childId) {
-    try {
-        const snapshot = await getDocs(
-            query(
-                collection(db, 'users', auth.currentUser.uid, 'children', childId, 'kafalat'),
-                orderBy('date', 'desc')
-            )
-        );
 
-        const kafalat = [];
-        snapshot.forEach(doc => {
-            const data = doc.data();
-            // تأكد من وجود العملة، لو مش موجودة خليها شيكل
-            if (!data.currency) {
-                data.currency = 'ILS';
-            }
-            kafalat.push({ id: doc.id, ...data });
-        });
-
-        return kafalat;
-    } catch (error) {
-        showToast('خطأ', 'حدث خطأ أثناء التحميل', 'error');
-        return [];
-    }
-}
 
 export async function loadOrganizations() {
     const user = auth.currentUser;
