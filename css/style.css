@@ -1008,3 +1008,188 @@ input:focus, select:focus {
     color: #6b7280;
     border: none;
 }
+/* ===== كفالة item ===== */
+.kafala-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    background: #f9fafb;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    transition: all 0.2s;
+}
+
+.kafala-item:hover {
+    background: #f3f4f6;
+}
+
+.kafala-icon {
+    font-size: 24px;
+    flex-shrink: 0;
+}
+
+.kafala-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.kafala-org {
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 4px;
+    font-size: 15px;
+}
+
+.kafala-date {
+    font-size: 13px;
+    color: #6b7280;
+}
+
+.kafala-amount {
+    font-weight: 700;
+    color: #10b981;
+    font-size: 16px;
+    margin-left: 8px;
+    flex-shrink: 0;
+}
+
+/* ===== زر الحذف ===== */
+.btn-delete-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    color: #9ca3af;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.btn-delete-icon:hover {
+    background: #fee2e2;
+    color: #ef4444;
+    transform: scale(1.05);
+}
+
+.btn-delete-icon:active {
+    transform: scale(0.95);
+}
+
+.btn-delete-icon svg {
+    width: 18px;
+    height: 18px;
+}
+
+/* ===== اختيار العملة ===== */
+.currency-selector {
+    display: flex;
+    gap: 8px;
+}
+
+.currency-btn {
+    flex: 1;
+    padding: 12px 8px;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    background: white;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+    text-align: center;
+}
+
+.currency-btn:hover {
+    border-color: #d1d5db;
+}
+
+.currency-btn.active {
+    border-color: #667eea;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+/* ===== مودال التحذير ===== */
+.modal-confirm {
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+}
+
+.confirm-content {
+    background: white;
+    border-radius: 24px;
+    padding: 32px 24px;
+    width: 90%;
+    max-width: 320px;
+    text-align: center;
+    transform: scale(0.9);
+    opacity: 0;
+    transition: all 0.3s ease;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.modal-confirm.active .confirm-content {
+    transform: scale(1);
+    opacity: 1;
+}
+
+.confirm-icon {
+    width: 64px;
+    height: 64px;
+    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    color: #dc2626;
+}
+
+.confirm-icon svg {
+    width: 32px;
+    height: 32px;
+}
+
+.confirm-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 8px;
+}
+
+.confirm-text {
+    font-size: 15px;
+    color: #6b7280;
+    margin-bottom: 24px;
+    line-height: 1.5;
+}
+
+.confirm-buttons {
+    display: flex;
+    gap: 12px;
+}
+
+.confirm-buttons .btn {
+    flex: 1;
+    margin: 0;
+    padding: 12px;
+    font-size: 15px;
+    border-radius: 12px;
+}
+
+/* ===== stats breakdown ===== */
+.stats-breakdown {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
