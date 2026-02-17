@@ -33,9 +33,7 @@
         <!-- Kafalat List -->
         <div class="card">
             <h3 style="margin-bottom: 16px; color: var(--dark);">سجل الكفالات</h3>
-            <div id="kafalatList">
-                <!-- Kafalat will be loaded here -->
-            </div>
+            <div id="kafalatList"></div>
             <div id="emptyKafalat" class="empty-state hidden">
                 <div class="empty-icon">📝</div>
                 <p>لا توجد كفالات مسجلة</p>
@@ -78,6 +76,25 @@
         </div>
     </div>
 
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal modal-confirm">
+        <div class="modal-content confirm-content">
+            <div class="confirm-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 6h18"></path>
+                    <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                    <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                </svg>
+            </div>
+            <h3 class="confirm-title">حذف الكفالة؟</h3>
+            <p class="confirm-text">هل أنت متأكدة من حذف هذه الكفالة؟ لا يمكن التراجع عن هذا الإجراء.</p>
+            <div class="confirm-buttons">
+                <button class="btn btn-danger" id="confirmDeleteBtn">نعم، احذف</button>
+                <button class="btn btn-secondary" onclick="closeDeleteModal()">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
     <script type="module">
         import { 
             initAuth, 
@@ -102,8 +119,8 @@
         }
 
         let organizations = [];
+        let kafalaToDelete = null;
 
-        // Check auth and load data
         initAuth(async (user) => {
             if (!user) {
                 window.location.href = 'login.html';
@@ -115,14 +132,13 @@
         });
 
         async function loadChildData() {
-            showLoading('جاري تحميل البيانات...');
+            showLoading();
             try {
                 const childDoc = await getDoc(doc(db, 'users', auth.currentUser.uid, 'children', childId));
                 if (!childDoc.exists()) {
                     window.location.href = 'index.html';
                     return;
                 }
-
                 const child = childDoc.data();
                 document.getElementById('childName').textContent = child.name;
                 document.getElementById('childInfo').textContent = `العمر: ${child.age} سنة`;
@@ -141,7 +157,7 @@
 
             let total = 0;
             kafalat.forEach(k => total += k.amount);
-            totalElement.textContent = formatCurrency(total);
+            totalElement.textContent = formatCurrency(total) + ' ₪';
 
             if (kafalat.length === 0) {
                 listContainer.innerHTML = '';
@@ -160,8 +176,13 @@
                             <div class="kafala-org">${kafala.organization}</div>
                             <div class="kafala-date">${formatDate(kafala.date)} ${kafala.notes ? '• ' + kafala.notes : ''}</div>
                         </div>
-                        <div class="kafala-amount">${formatCurrency(kafala.amount)}</div>
-                        <button class="btn-small btn-danger" onclick="handleDeleteKafala('${kafala.id}')">حذف</button>
+                        <div class="kafala-amount">${formatCurrency(kafala.amount)} ₪</div>
+                        <button class="btn-delete-icon" onclick="openDeleteModal('${kafala.id}')" title="حذف">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                            </svg>
+                        </button>
                     </div>
                 `;
             });
@@ -190,14 +211,11 @@
         window.showSuggestions = function() {
             const input = document.getElementById('kafalaOrg').value.toLowerCase();
             const suggestionsDiv = document.getElementById('suggestions');
-
             if (!input || organizations.length === 0) {
                 suggestionsDiv.classList.add('hidden');
                 return;
             }
-
             const filtered = organizations.filter(org => org.toLowerCase().includes(input));
-
             if (filtered.length > 0) {
                 suggestionsDiv.innerHTML = filtered.map(org => 
                     `<div class="suggestion-item" onclick="selectOrg('${org}')">${org}</div>`
@@ -218,7 +236,6 @@
             const amount = document.getElementById('kafalaAmount').value;
             const date = document.getElementById('kafalaDate').value;
             const notes = document.getElementById('kafalaNotes').value.trim();
-
             const success = await addKafala(childId, org, amount, date, notes);
             if (success) {
                 closeAddKafalaModal();
@@ -226,17 +243,32 @@
             }
         };
 
-        window.handleDeleteKafala = async function(kafalaId) {
-            const success = await deleteKafala(childId, kafalaId);
-            if (success) {
-                await loadKafalatList();
-            }
+        window.openDeleteModal = function(kafalaId) {
+            kafalaToDelete = kafalaId;
+            document.getElementById('deleteModal').classList.add('active');
         };
 
-        // Close modal on outside click
+        window.closeDeleteModal = function() {
+            kafalaToDelete = null;
+            document.getElementById('deleteModal').classList.remove('active');
+        };
+
+        document.getElementById('confirmDeleteBtn').addEventListener('click', async function() {
+            if (kafalaToDelete) {
+                closeDeleteModal();
+                const success = await deleteKafala(childId, kafalaToDelete);
+                if (success) await loadKafalatList();
+            }
+        });
+
+        document.getElementById('deleteModal').addEventListener('click', function(e) {
+            if (e.target === this) closeDeleteModal();
+        });
+
         document.getElementById('addKafalaModal').addEventListener('click', function(e) {
             if (e.target === this) closeAddKafalaModal();
         });
     </script>
 </body>
 </html>
+
