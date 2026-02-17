@@ -294,7 +294,12 @@ export async function loadKafalat(childId) {
 
         const kafalat = [];
         snapshot.forEach(doc => {
-            kafalat.push({ id: doc.id, ...doc.data() });
+            const data = doc.data();
+            // تأكد من وجود العملة، لو مش موجودة خليها شيكل
+            if (!data.currency) {
+                data.currency = 'ILS';
+            }
+            kafalat.push({ id: doc.id, ...data });
         });
 
         return kafalat;
