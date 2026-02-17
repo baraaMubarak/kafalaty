@@ -28,6 +28,7 @@
         <div class="card stats-card">
             <div class="stats-label">إجمالي الكفالات</div>
             <div class="stats-amount" id="childTotal">0 ₪</div>
+            <div class="stats-breakdown" id="statsBreakdown" style="margin-top: 8px; font-size: 13px; opacity: 0.9;"></div>
         </div>
 
         <!-- Kafalat List -->
@@ -54,13 +55,35 @@
                 <h3 class="modal-title">إضافة كفالة جديدة</h3>
                 <button class="modal-close" onclick="closeAddKafalaModal()">×</button>
             </div>
+            
             <div class="form-group" style="position: relative;">
                 <label>الجهة الكافلة</label>
                 <input type="text" id="kafalaOrg" placeholder="اختر أو اكتب جهة جديدة" autocomplete="off" oninput="showSuggestions()">
                 <div id="suggestions" class="suggestions hidden"></div>
             </div>
+
+            <!-- Currency Selection -->
             <div class="form-group">
-                <label>المبلغ (₪)</label>
+                <label>العملة</label>
+                <div class="currency-selector">
+                    <button type="button" class="currency-btn active" onclick="selectCurrency('ILS')">
+                        <span style="font-size: 20px;">₪</span>
+                        <span style="font-size: 11px; display: block;">شيكل</span>
+                    </button>
+                    <button type="button" class="currency-btn" onclick="selectCurrency('JOD')">
+                        <span style="font-size: 20px;">د.أ</span>
+                        <span style="font-size: 11px; display: block;">دينار</span>
+                    </button>
+                    <button type="button" class="currency-btn" onclick="selectCurrency('USD')">
+                        <span style="font-size: 20px;">$</span>
+                        <span style="font-size: 11px; display: block;">دولار</span>
+                    </button>
+                </div>
+                <input type="hidden" id="kafalaCurrency" value="ILS">
+            </div>
+
+            <div class="form-group">
+                <label>المبلغ</label>
                 <input type="number" id="kafalaAmount" placeholder="أدخل المبلغ">
             </div>
             <div class="form-group">
@@ -121,6 +144,12 @@
         let organizations = [];
         let kafalaToDelete = null;
 
+        const currencySymbols = {
+            'ILS': '₪',
+            'JOD': 'د.أ',
+            'USD': '$'
+        };
+
         initAuth(async (user) => {
             if (!user) {
                 window.location.href = 'login.html';
@@ -154,10 +183,27 @@
             const listContainer = document.getElementById('kafalatList');
             const emptyState = document.getElementById('emptyKafalat');
             const totalElement = document.getElementById('childTotal');
+            const breakdownElement = document.getElementById('statsBreakdown');
 
-            let total = 0;
-            kafalat.forEach(k => total += k.amount);
-            totalElement.textContent = formatCurrency(total) + ' ₪';
+            // حساب totals لكل عملة
+            let totals = { 'ILS': 0, 'JOD': 0, 'USD': 0 };
+            kafalat.forEach(k => {
+                const currency = k.currency || 'ILS';
+                totals[currency] += k.amount;
+            });
+
+            // عرض الإجمالي الرئيسي (شيكل)
+            totalElement.textContent = formatCurrency(totals['ILS']) + ' ₪';
+
+            // عرض breakdown لو في عملات تانية
+            let breakdownHtml = '';
+            if (totals['JOD'] > 0) {
+                breakdownHtml += `<span style="margin-left: 12px;">${totals['JOD']} د.أ</span>`;
+            }
+            if (totals['USD'] > 0) {
+                breakdownHtml += `<span style="margin-left: 12px;">${totals['USD']} $</span>`;
+            }
+            breakdownElement.innerHTML = breakdownHtml;
 
             if (kafalat.length === 0) {
                 listContainer.innerHTML = '';
@@ -169,6 +215,9 @@
 
             let html = '';
             kafalat.forEach(kafala => {
+                const currency = kafala.currency || 'ILS';
+                const symbol = currencySymbols[currency];
+                
                 html += `
                     <div class="kafala-item animate-fade-in">
                         <div class="kafala-icon">💰</div>
@@ -176,7 +225,9 @@
                             <div class="kafala-org">${kafala.organization}</div>
                             <div class="kafala-date">${formatDate(kafala.date)} ${kafala.notes ? '• ' + kafala.notes : ''}</div>
                         </div>
-                        <div class="kafala-amount">${formatCurrency(kafala.amount)} ₪</div>
+                        <div class="kafala-amount">
+                            ${kafala.amount} <span style="font-size: 14px;">${symbol}</span>
+                        </div>
                         <button class="btn-delete-icon" onclick="openDeleteModal('${kafala.id}')" title="حذف">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <polyline points="3 6 5 6 21 6"></polyline>
@@ -194,10 +245,23 @@
             window.location.href = 'index.html';
         };
 
+        window.selectCurrency = function(currency) {
+            document.getElementById('kafalaCurrency').value = currency;
+            document.querySelectorAll('.currency-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+        };
+
         window.openAddKafalaModal = function() {
             document.getElementById('addKafalaModal').classList.add('active');
             document.getElementById('kafalaDate').value = new Date().toISOString().split('T')[0];
             document.getElementById('kafalaOrg').focus();
+            // Reset currency to default
+            document.getElementById('kafalaCurrency').value = 'ILS';
+            document.querySelectorAll('.currency-btn').forEach((btn, index) => {
+                btn.classList.toggle('active', index === 0);
+            });
         };
 
         window.closeAddKafalaModal = function() {
@@ -236,7 +300,9 @@
             const amount = document.getElementById('kafalaAmount').value;
             const date = document.getElementById('kafalaDate').value;
             const notes = document.getElementById('kafalaNotes').value.trim();
-            const success = await addKafala(childId, org, amount, date, notes);
+            const currency = document.getElementById('kafalaCurrency').value;
+
+            const success = await addKafala(childId, org, amount, date, notes, currency);
             if (success) {
                 closeAddKafalaModal();
                 await loadKafalatList();
@@ -257,7 +323,9 @@
             if (kafalaToDelete) {
                 closeDeleteModal();
                 const success = await deleteKafala(childId, kafalaToDelete);
-                if (success) await loadKafalatList();
+                if (success) {
+                    await loadKafalatList();
+                }
             }
         });
 
@@ -271,4 +339,3 @@
     </script>
 </body>
 </html>
-
