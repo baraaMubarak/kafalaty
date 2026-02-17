@@ -323,5 +323,101 @@
                 .catch(err => console.log('Service Worker error:', err));
         }
     </script>
+    <script>
+    let deferredPrompt;
+    let installModalShown = false;
+
+    // التقاط حدث التثبيت
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        
+        // إظهار المودال بعد 3 ثواني
+        setTimeout(() => {
+            if (!installModalShown && !isAppInstalled()) {
+                showInstallModal();
+            }
+        }, 3000);
+        
+        // أو إظهار الشريط العلوي
+        // showInstallBanner();
+    });
+
+    // التحقق إذا التطبيق مثبت
+    function isAppInstalled() {
+        return window.matchMedia('(display-mode: standalone)').matches || 
+               window.navigator.standalone === true;
+    }
+
+    // إظهار مودال التثبيت
+    function showInstallModal() {
+        installModalShown = true;
+        document.getElementById('installModal').classList.add('active');
+    }
+
+    // إغلاق مودال التثبيت
+    function closeInstallModal() {
+        document.getElementById('installModal').classList.remove('active');
+        // إظهار الشريط بدلاً من المودال
+        setTimeout(showInstallBanner, 500);
+    }
+
+    // إظهار الشريط العلوي
+    function showInstallBanner() {
+        if (!isAppInstalled()) {
+            document.getElementById('installBanner').classList.add('show');
+        }
+    }
+
+    // إغلاق الشريط
+    function closeInstallBanner() {
+        document.getElementById('installBanner').classList.remove('show');
+    }
+
+    // زر التثبيت في المودال
+    document.getElementById('installBtn').addEventListener('click', async () => {
+        await installApp();
+    });
+
+    // زر التثبيت في الشريط
+    document.getElementById('bannerInstallBtn').addEventListener('click', async () => {
+        await installApp();
+    });
+
+    // دالة التثبيت
+    async function installApp() {
+        if (!deferredPrompt) {
+            showToast('تنبيه', 'يرجى استخدام Chrome أو Edge للتثبيت', 'warning');
+            return;
+        }
+        
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        
+        if (outcome === 'accepted') {
+            showToast('تم', 'جاري تثبيت التطبيق...', 'success');
+            closeInstallModal();
+            closeInstallBanner();
+        } else {
+            showToast('تم الإلغاء', 'يمكنك التثبيت لاحقاً', 'info');
+        }
+        
+        deferredPrompt = null;
+    }
+
+    // إغلاق المودال بالضغط خارجها
+    document.getElementById('installModal').addEventListener('click', (e) => {
+        if (e.target === e.currentTarget) closeInstallModal();
+    });
+
+    // فحص دوري إذا التطبيق مثبت
+    setInterval(() => {
+        if (isAppInstalled()) {
+            closeInstallModal();
+            closeInstallBanner();
+        }
+    }, 2000);
+</script>
+
 </body>
 </html>
