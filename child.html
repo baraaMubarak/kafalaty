@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#667eea">
     <title>كفالاتي - تفاصيل الطفل</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Loading Screen - تصميم جديد أنيق -->
+    <!-- Loading Screen -->
     <div id="loadingScreen" class="loading-screen">
         <div class="loading-content">
             <div class="loading-logo-text">كفالاتي</div>
@@ -27,7 +27,6 @@
             </button>
             <div class="user-welcome" style="justify-content: center; flex-direction: column; text-align: center;">
                 <div class="user-avatar" style="margin-bottom: 12px;">
-                    <!-- 👦 صبي -->
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                         <circle cx="12" cy="8" r="4"/>
                         <path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/>
@@ -97,7 +96,7 @@
                 <div id="suggestions" class="suggestions hidden"></div>
             </div>
 
-            <!-- Currency Selection - أزرار جميلة -->
+            <!-- Currency Selection -->
             <div class="form-group">
                 <label>العملة</label>
                 <div class="currency-selector">
@@ -180,14 +179,12 @@
         let organizations = [];
         let kafalaToDelete = null;
 
-        // Currency symbols
         const currencySymbols = {
             'ILS': '₪',
             'JOD': 'د.أ',
             'USD': '$'
         };
 
-        // Check auth and load data
         initAuth(async (user) => {
             if (!user) {
                 window.location.href = 'login.html';
@@ -224,18 +221,15 @@
             const totalElement = document.getElementById('childTotal');
             const breakdownElement = document.getElementById('statsBreakdown');
 
-            // Calculate totals by currency
             let totals = { 'ILS': 0, 'JOD': 0, 'USD': 0 };
             kafalat.forEach(k => {
                 const currency = k.currency || 'ILS';
                 totals[currency] += k.amount;
             });
 
-            // Display main total (ILS as default)
             const mainTotal = totals['ILS'];
             totalElement.textContent = formatCurrency(mainTotal) + ' ₪';
 
-            // Display breakdown if there are other currencies
             let breakdownHtml = '';
             if (totals['JOD'] > 0) {
                 breakdownHtml += `<span style="margin-left: 12px;">${totals['JOD']} د.أ</span>`;
@@ -260,7 +254,6 @@
                 html += `
                     <div class="kafala-item animate-fade-in">
                         <div class="kafala-icon">
-                            <!-- 💰 محفظة -->
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                                 <path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"/>
                                 <path d="M4 6v12a2 2 0 0 0 2 2h14v-4"/>
@@ -292,10 +285,7 @@
         };
 
         window.selectCurrency = function(currency) {
-            // Update hidden input
             document.getElementById('selectedCurrency').value = currency;
-
-            // Update button styles
             document.querySelectorAll('.currency-btn').forEach(btn => {
                 btn.classList.remove('active');
                 if (btn.dataset.currency === currency) {
@@ -308,7 +298,6 @@
             document.getElementById('addKafalaModal').classList.add('active');
             document.getElementById('kafalaDate').value = new Date().toISOString().split('T')[0];
             document.getElementById('kafalaOrg').focus();
-            // Reset currency to default
             selectCurrency('ILS');
         };
 
@@ -380,7 +369,6 @@
             }
         });
 
-        // Close modals on outside click
         document.querySelectorAll('.modal').forEach(modal => {
             modal.addEventListener('click', function(e) {
                 if (e.target === this) {
@@ -391,3 +379,4 @@
     </script>
 </body>
 </html>
+
