@@ -895,3 +895,116 @@ input:focus, select:focus {
     flex-wrap: wrap;
     gap: 8px;
 }
+/* ===== أيقونة الحذف الأنيقة ===== */
+.btn-delete-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: #9ca3af;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.btn-delete-icon:hover {
+    background: #fee2e2;
+    color: #ef4444;
+    transform: scale(1.1);
+}
+
+.btn-delete-icon:active {
+    transform: scale(0.95);
+}
+
+.btn-delete-icon svg {
+    width: 18px;
+    height: 18px;
+}
+
+/* ===== مودال التحذير الأنيق ===== */
+.modal-confirm {
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+}
+
+.confirm-content {
+    background: white;
+    border-radius: 24px;
+    padding: 32px 24px;
+    width: 90%;
+    max-width: 320px;
+    text-align: center;
+    transform: scale(0.9);
+    opacity: 0;
+    transition: all 0.3s ease;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.modal-confirm.active .confirm-content {
+    transform: scale(1);
+    opacity: 1;
+}
+
+.confirm-icon {
+    width: 64px;
+    height: 64px;
+    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    color: #dc2626;
+}
+
+.confirm-icon svg {
+    width: 32px;
+    height: 32px;
+}
+
+.confirm-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 8px;
+}
+
+.confirm-text {
+    font-size: 15px;
+    color: #6b7280;
+    margin-bottom: 24px;
+    line-height: 1.5;
+}
+
+.confirm-buttons {
+    display: flex;
+    gap: 12px;
+}
+
+.confirm-buttons .btn {
+    flex: 1;
+    margin: 0;
+    padding: 12px;
+    font-size: 15px;
+    border-radius: 12px;
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+    border: none;
+}
+
+.btn-secondary {
+    background: #f3f4f6;
+    color: #6b7280;
+    border: none;
+}
