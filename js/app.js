@@ -1,19 +1,19 @@
 import { auth, db } from './firebase-config.js';
-import { 
-    createUserWithEmailAndPassword, 
-    signInWithEmailAndPassword, 
-    signOut, 
-    onAuthStateChanged 
+import {
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    signOut,
+    onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
-import { 
-    collection, 
-    doc, 
-    setDoc, 
-    getDoc, 
-    getDocs, 
-    addDoc, 
-    deleteDoc, 
-    query, 
+import {
+    collection,
+    doc,
+    setDoc,
+    getDoc,
+    getDocs,
+    addDoc,
+    deleteDoc,
+    query,
     orderBy,
     where
 } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
@@ -42,7 +42,6 @@ export function showToast(title, message, type = 'success') {
 
     container.appendChild(toast);
 
-    // Auto remove after 3 seconds
     setTimeout(() => {
         toast.classList.add('hiding');
         setTimeout(() => toast.remove(), 300);
@@ -65,9 +64,11 @@ export function showLoading(message = 'جاري التحميل...') {
         loadingScreen.id = 'loadingScreen';
         loadingScreen.className = 'loading-screen';
         loadingScreen.innerHTML = `
-            <div class="loading-logo">💚</div>
-            <div class="loading-spinner"></div>
-            <div class="loading-text">${message}</div>
+            <div class="loading-content">
+                <div class="loading-logo">💚</div>
+                <div class="loading-text">${message}</div>
+                <div class="loading-bar"><div class="loading-progress"></div></div>
+            </div>
         `;
         document.body.appendChild(loadingScreen);
     } else {
@@ -185,7 +186,6 @@ export async function deleteChild(childId) {
     showLoading('جاري الحذف...');
 
     try {
-        // Delete all kafalat first
         const kafalatSnapshot = await getDocs(collection(db, 'users', auth.currentUser.uid, 'children', childId, 'kafalat'));
         for (const kafalaDoc of kafalatSnapshot.docs) {
             await deleteDoc(kafalaDoc.ref);
@@ -212,27 +212,40 @@ export async function loadChildren() {
             query(collection(db, 'users', user.uid, 'children'), orderBy('createdAt', 'desc'))
         );
 
+        if (snapshot.empty) return [];
+
         const children = [];
-        for (const doc of snapshot.docs) {
+        const promises = snapshot.docs.map(async (doc) => {
             const child = { id: doc.id, ...doc.data() };
 
-            // Calculate total kafalat
             const kafalatSnapshot = await getDocs(
                 collection(db, 'users', user.uid, 'children', doc.id, 'kafalat')
             );
 
-            let total = 0;
+            let totalILS = 0, totalUSD = 0, totalJOD = 0;
+
             kafalatSnapshot.forEach(kafalaDoc => {
-                total += kafalaDoc.data().amount;
+                const data = kafalaDoc.data();
+                const amount = data.amount || 0;
+                const currency = data.currency || 'ILS'; // افتراضي شيكل للكفالات القديمة
+
+                if (currency === 'USD') totalUSD += amount;
+                else if (currency === 'JOD') totalJOD += amount;
+                else totalILS += amount;
             });
 
-            child.totalKafalat = total;
+            child.totalKafalat = {
+                ILS: totalILS,
+                USD: totalUSD,
+                JOD: totalJOD
+            };
             child.kafalatCount = kafalatSnapshot.size;
-            children.push(child);
-        }
+            return child;
+        });
 
-        return children;
+        return await Promise.all(promises);
     } catch (error) {
+        console.error('Error loading children:', error);
         showToast('خطأ', 'حدث خطأ أثناء التحميل', 'error');
         return [];
     }
@@ -240,11 +253,10 @@ export async function loadChildren() {
 
 // ===== Kafala Functions =====
 
-// إضافة كفالة مع العملة
 export async function addKafala(childId, organization, amount, date, notes, currency = 'ILS') {
     try {
         showLoading();
-        
+
         if (!organization || !amount || !date) {
             hideLoading();
             showToast('تنبيه', 'الرجاء ملء جميع الحقول المطلوبة', 'warning');
@@ -259,12 +271,12 @@ export async function addKafala(childId, organization, amount, date, notes, curr
             notes: notes ? notes.trim() : '',
             createdAt: new Date().toISOString()
         };
-        
+
         const docRef = await addDoc(
-            collection(db, 'users', auth.currentUser.uid, 'children', childId, 'kafalat'), 
+            collection(db, 'users', auth.currentUser.uid, 'children', childId, 'kafalat'),
             kafalaData
         );
-        
+
         hideLoading();
         showToast('تم', 'تم إضافة الكفالة بنجاح', 'success');
         return docRef.id;
@@ -275,24 +287,23 @@ export async function addKafala(childId, organization, amount, date, notes, curr
     }
 }
 
-// تحميل الكفالات
 export async function loadKafalat(childId) {
     try {
         const q = query(
             collection(db, 'users', auth.currentUser.uid, 'children', childId, 'kafalat'),
             orderBy('date', 'desc')
         );
-        
+
         const snapshot = await getDocs(q);
         const kafalat = [];
-        
+
         snapshot.forEach(doc => {
             kafalat.push({
                 id: doc.id,
                 ...doc.data()
             });
         });
-        
+
         return kafalat;
     } catch (error) {
         showToast('خطأ', 'حدث خطأ في تحميل البيانات', 'error');
@@ -300,7 +311,6 @@ export async function loadKafalat(childId) {
     }
 }
 
-// حذف كفالة
 export async function deleteKafala(childId, kafalaId) {
     try {
         showLoading();
@@ -314,8 +324,6 @@ export async function deleteKafala(childId, kafalaId) {
         return false;
     }
 }
-
-
 
 export async function loadOrganizations() {
     const user = auth.currentUser;
@@ -349,8 +357,10 @@ export function initAuth(callback) {
 }
 
 // ===== Format Currency =====
-export function formatCurrency(amount) {
-    return amount.toLocaleString('ar-SA') + ' ₪';
+export function formatCurrency(amount, currency = 'ILS') {
+    const formatted = amount.toLocaleString('ar-SA');
+    const symbol = currency === 'USD' ? '$' : currency === 'JOD' ? 'د.أ' : '₪';
+    return `${formatted} ${symbol}`;
 }
 
 // ===== Format Date =====
