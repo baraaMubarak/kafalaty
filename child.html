@@ -27,7 +27,11 @@
         <!-- Stats -->
         <div class="card stats-card">
             <div class="stats-label">إجمالي الكفالات</div>
-            <div class="stats-amount" id="childTotal">0 ₪</div>
+            <div id="totalsContainer" style="margin-top: 12px;">
+                <div class="stats-amount" id="childTotalILS">0 ₪</div>
+                <div class="stats-amount" id="childTotalUSD" style="font-size: 24px; margin-top: 8px; opacity: 0.9;">0 $</div>
+                <div class="stats-amount" id="childTotalJOD" style="font-size: 24px; margin-top: 8px; opacity: 0.9;">0 د.أ</div>
+            </div>
         </div>
 
         <!-- Kafalat List -->
@@ -62,21 +66,21 @@
                 <div id="suggestions" class="suggestions hidden"></div>
             </div>
             <div class="form-group">
-    <label>نوع العملة</label>
-    <div style="position: relative; width: 100%; font-family: 'Segoe UI', sans-serif;">
-        <button type="button" onclick="toggleCurrencyMenu()" id="currencyBtn" style="width: 100%; padding: 12px 16px; background: #fff; border: 1px solid #ddd; border-radius: 8px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 14px; transition: 0.3s; text-align: right;">
-            <span id="currencyText">نوع العملة</span>
-            <span id="currencyArrow" style="transition: 0.3s;">▼</span>
-        </button>
-        
-        <div id="currencyMenu" style="position: absolute; top: 100%; right: 0; left: 0; background: #fff; border: 1px solid #ddd; border-radius: 0 0 8px 8px; margin-top: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.3s; z-index: 999;">
-            <div onclick="selectCurrency(this, 'شيكل')" style="padding: 12px 16px; cursor: pointer; transition: 0.2s; border-bottom: 1px solid #f0f0f0;" onmouseover="this.style.background='#f5f5f5'" onmouseout="this.style.background='#fff'">شيكل ₪</div>
-            <div onclick="selectCurrency(this, 'دولار')" style="padding: 12px 16px; cursor: pointer; transition: 0.2s; border-bottom: 1px solid #f0f0f0;" onmouseover="this.style.background='#f5f5f5'" onmouseout="this.style.background='#fff'">دولار $</div>
-            <div onclick="selectCurrency(this, 'دينار')" style="padding: 12px 16px; cursor: pointer; transition: 0.2s;" onmouseover="this.style.background='#f5f5f5'" onmouseout="this.style.background='#fff'">دينار د.أ</div>
-        </div>
-    </div>
-    <input type="hidden" id="selectedCurrency" value="">
-</div>
+                <label>نوع العملة</label>
+                <div style="position: relative; width: 100%; font-family: 'Segoe UI', sans-serif;">
+                    <button type="button" onclick="toggleCurrencyMenu()" id="currencyBtn" style="width: 100%; padding: 12px 16px; background: #fff; border: 1px solid #ddd; border-radius: 8px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 14px; transition: 0.3s; text-align: right;">
+                        <span id="currencyText">شيكل ₪</span>
+                        <span id="currencyArrow" style="transition: 0.3s;">▼</span>
+                    </button>
+                    
+                    <div id="currencyMenu" style="position: absolute; top: 100%; right: 0; left: 0; background: #fff; border: 1px solid #ddd; border-radius: 0 0 8px 8px; margin-top: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.3s; z-index: 999;">
+                        <div onclick="selectCurrency(this, 'ILS', 'شيكل ₪')" style="padding: 12px 16px; cursor: pointer; transition: 0.2s; border-bottom: 1px solid #f0f0f0;" onmouseover="this.style.background='#f5f5f5'" onmouseout="this.style.background='#fff'">شيكل ₪</div>
+                        <div onclick="selectCurrency(this, 'USD', 'دولار $')" style="padding: 12px 16px; cursor: pointer; transition: 0.2s; border-bottom: 1px solid #f0f0f0;" onmouseover="this.style.background='#f5f5f5'" onmouseout="this.style.background='#fff'">دولار $</div>
+                        <div onclick="selectCurrency(this, 'JOD', 'دينار د.أ')" style="padding: 12px 16px; cursor: pointer; transition: 0.2s;" onmouseover="this.style.background='#f5f5f5'" onmouseout="this.style.background='#fff'">دينار د.أ</div>
+                    </div>
+                </div>
+                <input type="hidden" id="selectedCurrency" value="ILS">
+            </div>
             <div class="form-group">
                 <label>المبلغ</label>
                 <input type="number" id="kafalaAmount" placeholder="أدخل المبلغ">
@@ -150,18 +154,34 @@
         }
 
         async function loadKafalatList() {
+            showLoading('جاري تحميل الكفالات...');
             const kafalat = await loadKafalat(childId);
             const listContainer = document.getElementById('kafalatList');
             const emptyState = document.getElementById('emptyKafalat');
-            const totalElement = document.getElementById('childTotal');
 
-            let total = 0;
-            kafalat.forEach(k => total += k.amount);
-            totalElement.textContent = formatCurrency(total);
+            // حساب المجاميع حسب العملة
+            let totalILS = 0, totalUSD = 0, totalJOD = 0;
+
+            kafalat.forEach(k => {
+                if (k.currency === 'USD') totalUSD += k.amount;
+                else if (k.currency === 'JOD') totalJOD += k.amount;
+                else totalILS += k.amount; // ILS أو افتراضي
+            });
+
+            // عرض المجاميع
+            document.getElementById('childTotalILS').textContent = formatCurrency(totalILS, 'ILS');
+            document.getElementById('childTotalUSD').textContent = formatCurrency(totalUSD, 'USD');
+            document.getElementById('childTotalJOD').textContent = formatCurrency(totalJOD, 'JOD');
+
+            // إخفاء العملات اللي مافيهن كفالات
+            document.getElementById('childTotalILS').style.display = totalILS > 0 ? 'block' : 'none';
+            document.getElementById('childTotalUSD').style.display = totalUSD > 0 ? 'block' : 'none';
+            document.getElementById('childTotalJOD').style.display = totalJOD > 0 ? 'block' : 'none';
 
             if (kafalat.length === 0) {
                 listContainer.innerHTML = '';
                 emptyState.classList.remove('hidden');
+                hideLoading();
                 return;
             }
 
@@ -169,6 +189,7 @@
 
             let html = '';
             kafalat.forEach(kafala => {
+                const currencySymbol = kafala.currency === 'USD' ? '$' : kafala.currency === 'JOD' ? 'د.أ' : '₪';
                 html += `
                     <div class="kafala-item animate-fade-in">
                         <div class="kafala-icon">💰</div>
@@ -176,13 +197,17 @@
                             <div class="kafala-org">${kafala.organization}</div>
                             <div class="kafala-date">${formatDate(kafala.date)} ${kafala.notes ? '• ' + kafala.notes : ''}</div>
                         </div>
-                        <div class="kafala-amount">${formatCurrency(kafala.amount)}</div>
+                        <div class="kafala-amount" style="display: flex; flex-direction: column; align-items: flex-end;">
+                            <span style="font-weight: 700; color: var(--success);">${kafala.amount.toLocaleString('ar-SA')}</span>
+                            <span style="font-size: 12px; color: var(--gray);">${currencySymbol}</span>
+                        </div>
                         <button class="btn-small btn-danger" onclick="handleDeleteKafala('${kafala.id}')">حذف</button>
                     </div>
                 `;
             });
 
             listContainer.innerHTML = html;
+            hideLoading();
         }
 
         window.goBack = function() {
@@ -193,6 +218,8 @@
             document.getElementById('addKafalaModal').classList.add('active');
             document.getElementById('kafalaDate').value = new Date().toISOString().split('T')[0];
             document.getElementById('kafalaOrg').focus();
+            // إعادة تعيين العملة للافتراضي
+            selectCurrency(null, 'ILS', 'شيكل ₪');
         };
 
         window.closeAddKafalaModal = function() {
@@ -201,6 +228,29 @@
             document.getElementById('kafalaAmount').value = '';
             document.getElementById('kafalaNotes').value = '';
             document.getElementById('suggestions').classList.add('hidden');
+        };
+
+        window.toggleCurrencyMenu = function() {
+            const menu = document.getElementById('currencyMenu');
+            const arrow = document.getElementById('currencyArrow');
+            
+            if (menu.style.visibility === 'hidden' || menu.style.visibility === '') {
+                menu.style.opacity = '1';
+                menu.style.visibility = 'visible';
+                menu.style.transform = 'translateY(0)';
+                arrow.style.transform = 'rotate(180deg)';
+            } else {
+                menu.style.opacity = '0';
+                menu.style.visibility = 'hidden';
+                menu.style.transform = 'translateY(-10px)';
+                arrow.style.transform = 'rotate(0deg)';
+            }
+        };
+
+        window.selectCurrency = function(element, code, display) {
+            document.getElementById('selectedCurrency').value = code;
+            document.getElementById('currencyText').textContent = display;
+            toggleCurrencyMenu();
         };
 
         window.showSuggestions = function() {
@@ -234,8 +284,9 @@
             const amount = document.getElementById('kafalaAmount').value;
             const date = document.getElementById('kafalaDate').value;
             const notes = document.getElementById('kafalaNotes').value.trim();
+            const currency = document.getElementById('selectedCurrency').value;
 
-            const success = await addKafala(childId, org, amount, date, notes);
+            const success = await addKafala(childId, org, amount, date, notes, currency);
             if (success) {
                 closeAddKafalaModal();
                 await loadKafalatList();
@@ -252,6 +303,18 @@
         // Close modal on outside click
         document.getElementById('addKafalaModal').addEventListener('click', function(e) {
             if (e.target === this) closeAddKafalaModal();
+        });
+
+        // Close currency menu when clicking outside
+        document.addEventListener('click', function(e) {
+            const currencyBtn = document.getElementById('currencyBtn');
+            const currencyMenu = document.getElementById('currencyMenu');
+            if (!currencyBtn.contains(e.target) && !currencyMenu.contains(e.target)) {
+                currencyMenu.style.opacity = '0';
+                currencyMenu.style.visibility = 'hidden';
+                currencyMenu.style.transform = 'translateY(-10px)';
+                document.getElementById('currencyArrow').style.transform = 'rotate(0deg)';
+            }
         });
     </script>
 </body>
