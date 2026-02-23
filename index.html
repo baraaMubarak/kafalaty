@@ -7,17 +7,18 @@
     <title>كفالاتي - قائمة الأطفال</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="icon-192x192.png">
 </head>
 <body>
     <!-- Loading Screen -->
     <div id="loadingScreen" class="loading-screen">
         <div class="loading-content">
             <div class="loading-logo">
-                <svg viewBox="0 0 100 100" class="logo-svg">
+                <svg class="logo-svg" viewBox="0 0 100 100">
                     <circle cx="50" cy="50" r="45" fill="none" stroke="white" stroke-width="3"/>
-                    <path d="M50 25 L50 75 M25 50 L75 50" stroke="white" stroke-width="3" stroke-linecap="round"/>
-                    <circle cx="50" cy="50" r="15" fill="white"/>
+                    <path d="M50 25 C30 25, 25 45, 25 50 C25 65, 35 75, 50 75 C65 75, 75 65, 75 50 C75 45, 70 25, 50 25" fill="white" opacity="0.9"/>
+                    <circle cx="38" cy="45" r="3" fill="#667eea"/>
+                    <circle cx="62" cy="45" r="3" fill="#667eea"/>
+                    <path d="M45 55 Q50 60, 55 55" fill="none" stroke="#667eea" stroke-width="2" stroke-linecap="round"/>
                 </svg>
             </div>
             <div class="loading-text">كفالاتي</div>
@@ -32,22 +33,23 @@
         <!-- Header -->
         <div class="header">
             <button class="logout-btn" onclick="handleLogout()">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-                    <polyline points="16 17 21 12 16 7"/>
-                    <line x1="21" y1="12" x2="9" y2="12"/>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16 17, 21 12, 16 7"></polyline>
+                    <line x1="21" y1="12" x2="9" y2="12"></line>
                 </svg>
                 خروج
             </button>
+            
             <div class="user-welcome">
                 <div class="user-avatar">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                        <circle cx="12" cy="7" r="4"/>
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
                     </svg>
                 </div>
                 <div class="user-info">
-                    <div class="user-greeting">أهلاً بكِ</div>
+                    <div class="user-greeting">أهلاً بكِ يا</div>
                     <div class="user-name" id="userName">...</div>
                 </div>
             </div>
@@ -55,8 +57,14 @@
 
         <!-- Stats -->
         <div class="card stats-card">
-            <div class="stats-label">إجمالي جميع الكفالات</div>
-            <div class="stats-amount" id="totalAmount">0 ₪</div>
+            <div class="stats-label">إجمالي الكفالات</div>
+            <div id="globalTotals" style="margin-top: 12px;">
+                <div class="stats-amount" id="globalTotalILS">0 ₪</div>
+                <div style="font-size: 18px; margin-top: 8px; opacity: 0.9;">
+                    <span id="globalTotalUSD" style="margin-left: 12px;">0 $</span>
+                    <span id="globalTotalJOD">0 د.أ</span>
+                </div>
+            </div>
         </div>
 
         <!-- Children List -->
@@ -68,22 +76,17 @@
         <div id="emptyState" class="empty-state hidden">
             <div class="empty-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                    <path d="M12 2a10 10 0 1 0 10 10H12V2z"/>
-                    <path d="M12 2a10 10 0 0 1 10 10"/>
-                    <circle cx="12" cy="12" r="3"/>
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
                 </svg>
             </div>
-            <p>لا يوجد أطفال مسجلين</p>
-            <p class="mb-4">اضغط الزر أدناه لإضافة طفل</p>
+            <h3>لا يوجد أطفال مسجلين</h3>
+            <p>اضغطي على الزر أدناه لإضافة طفل جديد</p>
         </div>
     </div>
 
     <!-- Add Child FAB -->
     <button class="btn btn-primary btn-fab" onclick="openAddChildModal()">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="12" y1="5" x2="12" y2="19"/>
-            <line x1="5" y1="12" x2="19" y2="12"/>
-        </svg>
+        <span>+</span>
         <span>إضافة طفل</span>
     </button>
 
@@ -93,9 +96,9 @@
             <div class="modal-header">
                 <h3 class="modal-title">إضافة طفل جديد</h3>
                 <button class="modal-close" onclick="closeAddChildModal()">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="18" y1="6" x2="6" y2="18"/>
-                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
                     </svg>
                 </button>
             </div>
@@ -107,122 +110,108 @@
                 <label>العمر</label>
                 <input type="number" id="childAge" placeholder="أدخل عمر الطفل">
             </div>
-            <button class="btn btn-success" onclick="handleAddChild()">إضافة</button>
+            <button class="btn btn-primary" onclick="handleAddChild()">حفظ</button>
             <button class="btn btn-secondary mt-4" onclick="closeAddChildModal()">إلغاء</button>
-        </div>
-    </div>
-
-    <!-- Delete Confirmation Modal -->
-    <div id="deleteModal" class="modal modal-confirm">
-        <div class="modal-content confirm-content">
-            <div class="confirm-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10"/>
-                    <line x1="12" y1="8" x2="12" y2="12"/>
-                    <line x1="12" y1="16" x2="12.01" y2="16"/>
-                </svg>
-            </div>
-            <h3 class="confirm-title">تأكيد الحذف</h3>
-            <p class="confirm-text">هل أنت متأكدة من حذف هذا الطفل وجميع كفالاته؟</p>
-            <p class="confirm-warning">لا يمكن التراجع عن هذا الإجراء</p>
-            <div class="confirm-buttons">
-                <button class="btn btn-danger" id="confirmDeleteBtn">نعم، احذف</button>
-                <button class="btn btn-secondary" onclick="closeDeleteModal()">إلغاء</button>
-            </div>
         </div>
     </div>
 
     <script type="module">
         import { 
             initAuth, 
-            logout, 
-            addChild, 
             loadChildren, 
-            deleteChild,
-            formatCurrency,
+            addChild, 
+            deleteChild, 
+            logout,
             showLoading,
             hideLoading,
-            showToast 
+            showToast,
+            formatCurrency
         } from './js/app.js';
         import { doc, getDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
-        import { db, auth } from './js/firebase-config.js';
+        import { db } from './js/firebase-config.js';
 
-        let currentChildren = [];
-        let childToDelete = null;
+        let currentUser = null;
 
-        // Check auth state
+        // Check auth
         initAuth(async (user) => {
             if (!user) {
                 window.location.href = 'login.html';
                 return;
             }
-
-            // Load user name
-            await loadUserName();
+            currentUser = user;
+            
+            const userDoc = await getDoc(doc(db, 'users', user.uid));
+            if (userDoc.exists()) {
+                document.getElementById('userName').textContent = userDoc.data().name;
+            }
+            
             await loadChildrenList();
         });
 
-        async function loadUserName() {
-            try {
-                const userDoc = await getDoc(doc(db, 'users', auth.currentUser.uid));
-                if (userDoc.exists()) {
-                    document.getElementById('userName').textContent = userDoc.data().name;
-                }
-            } catch (error) {
-                console.error('Error loading user name:', error);
-            }
-        }
-
         async function loadChildrenList() {
-            showLoading();
-            currentChildren = await loadChildren();
-            hideLoading();
-            renderChildren();
-        }
-
-        function renderChildren() {
+            showLoading('جاري تحميل البيانات...');
+            const children = await loadChildren();
+            
             const listContainer = document.getElementById('childrenList');
             const emptyState = document.getElementById('emptyState');
-            const totalElement = document.getElementById('totalAmount');
+            
+            // حساب المجاميع العامة
+            let globalILS = 0, globalUSD = 0, globalJOD = 0;
 
-            if (currentChildren.length === 0) {
+            if (children.length === 0) {
                 listContainer.innerHTML = '';
                 emptyState.classList.remove('hidden');
-                totalElement.textContent = '0 ₪';
+                hideLoading();
                 return;
             }
 
             emptyState.classList.add('hidden');
-
-            let totalAll = 0;
+            
             let html = '';
+            children.forEach(child => {
+                // جمع المجاميع العامة
+                if (child.totalKafalat) {
+                    globalILS += child.totalKafalat.ILS || 0;
+                    globalUSD += child.totalKafalat.USD || 0;
+                    globalJOD += child.totalKafalat.JOD || 0;
+                }
 
-            currentChildren.forEach(child => {
-                totalAll += child.totalKafalat;
+                const totalILS = child.totalKafalat?.ILS || 0;
+                const totalUSD = child.totalKafalat?.USD || 0;
+                const totalJOD = child.totalKafalat?.JOD || 0;
+                
+                // بناء نص المجاميع
+                let totalsHtml = '';
+                if (totalILS > 0) totalsHtml += `<div style="font-weight: 700; color: var(--success);">${formatCurrency(totalILS, 'ILS')}</div>`;
+                if (totalUSD > 0) totalsHtml += `<div style="font-size: 14px; color: var(--success); opacity: 0.9;">${formatCurrency(totalUSD, 'USD')}</div>`;
+                if (totalJOD > 0) totalsHtml += `<div style="font-size: 14px; color: var(--success); opacity: 0.9;">${formatCurrency(totalJOD, 'JOD')}</div>`;
+
                 html += `
                     <div class="card child-card animate-fade-in">
-                        <div class="child-content" onclick="goToChild('${child.id}')">
+                        <div class="child-content" onclick="window.location.href='child.html?id=${child.id}'">
                             <div class="child-avatar">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                    <circle cx="12" cy="8" r="4"/>
-                                    <path d="M4 20c0-4 4-6 8-6s8 2 8 6"/>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="12" cy="7" r="4"></circle>
                                 </svg>
                             </div>
                             <div class="child-info">
                                 <div class="child-name">${child.name}</div>
-                                <div class="child-meta">${child.age} سنة • ${child.kafalatCount} كفالة</div>
+                                <div class="child-meta">${child.age} سنة • ${child.kafalatCount || 0} كفالات</div>
                             </div>
-                            <div class="child-total">${formatCurrency(child.totalKafalat)}</div>
+                            <div class="child-totals" style="text-align: left;">
+                                ${totalsHtml}
+                            </div>
                             <div class="child-arrow">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <polyline points="15 18 9 12 15 6"/>
+                                    <polyline points="9 18, 15 12, 9 6"></polyline>
                                 </svg>
                             </div>
                         </div>
-                        <button class="btn-delete-icon" onclick="event.stopPropagation(); openDeleteModal('${child.id}')" title="حذف">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="3 6 5 6 21 6"/>
-                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                        <button class="btn-delete-icon" onclick="event.stopPropagation(); handleDeleteChild('${child.id}')" title="حذف">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="3 6, 5 6, 21 6"></polyline>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
                             </svg>
                         </button>
                     </div>
@@ -230,12 +219,19 @@
             });
 
             listContainer.innerHTML = html;
-            totalElement.textContent = formatCurrency(totalAll);
-        }
 
-        window.goToChild = function(childId) {
-            window.location.href = `child.html?id=${childId}`;
-        };
+            // عرض المجاميع العامة
+            document.getElementById('globalTotalILS').textContent = formatCurrency(globalILS, 'ILS');
+            document.getElementById('globalTotalUSD').textContent = formatCurrency(globalUSD, 'USD');
+            document.getElementById('globalTotalJOD').textContent = formatCurrency(globalJOD, 'JOD');
+
+            // إخفاء العملات اللي مافيهن
+            document.getElementById('globalTotalILS').style.display = globalILS > 0 ? 'block' : 'none';
+            document.getElementById('globalTotalUSD').style.display = globalUSD > 0 ? 'inline' : 'none';
+            document.getElementById('globalTotalJOD').style.display = globalJOD > 0 ? 'inline' : 'none';
+
+            hideLoading();
+        }
 
         window.openAddChildModal = function() {
             document.getElementById('addChildModal').classList.add('active');
@@ -259,46 +255,24 @@
             }
         };
 
-        window.openDeleteModal = function(childId) {
-            childToDelete = childId;
-            document.getElementById('deleteModal').classList.add('active');
-        };
-
-        window.closeDeleteModal = function() {
-            childToDelete = null;
-            document.getElementById('deleteModal').classList.remove('active');
-        };
-
-        document.getElementById('confirmDeleteBtn').addEventListener('click', async function() {
-            if (childToDelete) {
-                closeDeleteModal();
-                const success = await deleteChild(childToDelete);
-                if (success) {
-                    await loadChildrenList();
-                }
+        window.handleDeleteChild = async function(childId) {
+            if (!confirm('هل أنت متأكدة من حذف هذا الطفل وجميع كفالاته؟\nلا يمكن التراجع عن هذا الإجراء')) return;
+            
+            const success = await deleteChild(childId);
+            if (success) {
+                await loadChildrenList();
             }
-        });
+        };
 
         window.handleLogout = async function() {
             await logout();
             window.location.href = 'login.html';
         };
 
-        // Close modals on outside click
-        document.querySelectorAll('.modal').forEach(modal => {
-            modal.addEventListener('click', function(e) {
-                if (e.target === this) {
-                    this.classList.remove('active');
-                }
-            });
+        // Close modal on outside click
+        document.getElementById('addChildModal').addEventListener('click', function(e) {
+            if (e.target === this) closeAddChildModal();
         });
-
-        // Register Service Worker for PWA
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js')
-                .then(() => console.log('Service Worker registered'))
-                .catch(err => console.log('Service Worker error:', err));
-        }
     </script>
 </body>
 </html>
