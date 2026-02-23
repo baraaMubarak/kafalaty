@@ -8,11 +8,24 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <!-- Loading Screen -->
+    <!-- Loading Screen - نفس التصميم في index.html -->
     <div id="loadingScreen" class="loading-screen">
-        <div class="loading-logo">💚</div>
-        <div class="loading-spinner"></div>
-        <div class="loading-text">جاري التحميل...</div>
+        <div class="loading-content">
+            <div class="loading-logo">
+                <svg class="logo-svg" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="45" fill="none" stroke="white" stroke-width="3"/>
+                    <path d="M50 25 C30 25, 25 45, 25 50 C25 65, 35 75, 50 75 C65 75, 75 65, 75 50 C75 45, 70 25, 50 25" fill="white" opacity="0.9"/>
+                    <circle cx="38" cy="45" r="3" fill="#667eea"/>
+                    <circle cx="62" cy="45" r="3" fill="#667eea"/>
+                    <path d="M45 55 Q50 60, 55 55" fill="none" stroke="#667eea" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <div class="loading-text">كفالاتي</div>
+            <div class="loading-subtext" id="loadingSubtext">جاري التحميل...</div>
+            <div class="loading-bar">
+                <div class="loading-progress"></div>
+            </div>
+        </div>
     </div>
 
     <div class="container">
@@ -65,12 +78,27 @@
     </div>
 
     <script type="module">
-        import { initAuth, login, register, showLoading } from './js/app.js';
+        import { initAuth, login, register, showToast } from './js/app.js';
+
+        // دوال التحميل المحسنة - نفس التصميم في index.html
+        function showLoading(message = 'جاري التحميل...') {
+            const loadingScreen = document.getElementById('loadingScreen');
+            const subtext = document.getElementById('loadingSubtext');
+            if (subtext) subtext.textContent = message;
+            loadingScreen.classList.remove('hidden');
+        }
+
+        function hideLoading() {
+            const loadingScreen = document.getElementById('loadingScreen');
+            loadingScreen.classList.add('hidden');
+        }
 
         // Check if already logged in
         initAuth((user) => {
             if (user) {
                 window.location.href = 'index.html';
+            } else {
+                hideLoading();
             }
         });
 
@@ -85,9 +113,17 @@
             const id = document.getElementById('loginId').value.trim();
             const password = document.getElementById('loginPassword').value;
 
+            if (!id || !password) {
+                showToast('خطأ', 'الرجاء ملء جميع الحقول', 'error');
+                return;
+            }
+
+            showLoading('جاري تسجيل الدخول...');
             const success = await login(id, password);
             if (success) {
                 window.location.href = 'index.html';
+            } else {
+                hideLoading();
             }
         };
 
@@ -97,9 +133,17 @@
             const password = document.getElementById('registerPassword').value;
             const confirm = document.getElementById('registerConfirm').value;
 
+            if (!id || !name || !password || !confirm) {
+                showToast('خطأ', 'الرجاء ملء جميع الحقول', 'error');
+                return;
+            }
+
+            showLoading('جاري إنشاء الحساب...');
             const success = await register(id, name, password, confirm);
             if (success) {
                 window.location.href = 'index.html';
+            } else {
+                hideLoading();
             }
         };
     </script>
